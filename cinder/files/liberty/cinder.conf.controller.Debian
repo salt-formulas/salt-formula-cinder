@@ -144,7 +144,7 @@ idle_timeout=3600
 max_pool_size=30
 max_retries=-1
 max_overflow=40
-connection = {{ controller.database.engine }}://{{ controller.database.user }}:{{ controller.database.password }}@{{ controller.database.host }}/{{ controller.database.name }}
+connection = {{ controller.database.engine }}+pymysql://{{ controller.database.user }}:{{ controller.database.password }}@{{ controller.database.host }}/{{ controller.database.name }}
 
 {# new way #}
 

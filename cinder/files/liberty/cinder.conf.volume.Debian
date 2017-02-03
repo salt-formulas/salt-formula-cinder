@@ -140,7 +140,7 @@ idle_timeout=3600
 max_pool_size=30
 max_retries=-1
 max_overflow=40
-connection = {{ volume.database.engine }}://{{ volume.database.user }}:{{ volume.database.password }}@{{ volume.database.host }}/{{ volume.database.name }}
+connection = {{ volume.database.engine }}+pymysql://{{ volume.database.user }}:{{ volume.database.password }}@{{ volume.database.host }}/{{ volume.database.name }}
 
 {# new way #}
 
