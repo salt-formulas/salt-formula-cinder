@@ -141,7 +141,7 @@ memcached_servers={%- for member in volume.cache.members %}{{ member.host }}:112
 auth_version = v3
 
 [barbican]
-auth_endpoint=http://{{ controller.identity.host }}:5000
+auth_endpoint=http://{{ volume.identity.host }}:5000
 
 [database]
 idle_timeout=3600
