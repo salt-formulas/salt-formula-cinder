@@ -466,6 +466,23 @@ Cinder setup with Solidfire
             clustername: cluster1
             sf_emulate_512: false
 
+Cinder setup with Block Device driver
+
+.. code-block:: yaml
+
+    cinder:
+      volume:
+        enabled: true
+        backend:
+          bdd:
+            engine: bdd
+            enabled: true
+            type_name: bdd
+            devices:
+              - sdb
+              - sdc
+              - sdd
+
 Enable cinder-backup service for ceph
 
 .. code-block:: yaml
