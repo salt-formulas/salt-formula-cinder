@@ -170,6 +170,21 @@ hp3parclient:
 
 {%- endif %}
 
+{%- if backend.engine == 'pure' %}
+
+pureclient:
+  pkg.installed:
+    - names:
+      - python-pip
+
+purestorage:
+  pip.installed:
+    - name: purestorage
+    - require:
+      - pkg: pureclient
+
+{%- endif %}
+
 {%- if backend.engine == 'fujitsu' %}
 
 cinder_driver_fujitsu_{{ loop.index }}:

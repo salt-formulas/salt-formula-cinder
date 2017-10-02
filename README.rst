@@ -520,6 +520,20 @@ Extra parameters for HP LeftHand
 
     cinder type-key normal-storage set hplh:data_pl=r-10-2 hplh:provisioning=full
 
+Cinder setup with Pure Storage
+
+.. code-block:: yaml
+
+    cinder:
+      volume:
+        enabled: true
+        backend:
+          pure:
+            engine: pure
+            protocol: ISCSI
+            san_ip: 10.10.10.10
+            pure_api_token: 960e185a-255f-4bdb-3b03-3b9eb1e5cf1f
+
 Cinder setup with Solidfire
 
 .. code-block:: yaml

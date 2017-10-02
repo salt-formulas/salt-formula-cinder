@@ -346,6 +346,18 @@ hitachi_storage_cli=HORCM
 
 {%- endif %}
 
+{%- if volume.storage.engine == "pure" %}
+
+{%- for type in volume.get('types', []) %}
+
+[{{ type.backend }}]
+volume_backend_name={{ type.backend }}
+use_multipath_for_image_xfer = True
+
+{%- endfor %}
+
+{%- endif %}
+
 {%- if volume.storage.engine == "ceph" %}
 
 {%- for type in volume.get('types', []) %}

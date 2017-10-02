@@ -29,6 +29,8 @@ env:
     - PLATFORM=trevorj/salty-whales:xenial OS_VERSION=ocata SUITE=hp3par_single
     - PLATFORM=trevorj/salty-whales:trusty OS_VERSION=mitaka SUITE=lefthand_single
     - PLATFORM=trevorj/salty-whales:xenial OS_VERSION=ocata SUITE=lefthand_single
+    - PLATFORM=trevorj/salty-whales:trusty OS_VERSION=mitaka SUITE=pure_single
+    - PLATFORM=trevorj/salty-whales:xenial OS_VERSION=ocata SUITE=pure_single
     - PLATFORM=trevorj/salty-whales:trusty OS_VERSION=mitaka SUITE=solidfire_single
     - PLATFORM=trevorj/salty-whales:xenial OS_VERSION=ocata SUITE=solidfire_single
     - PLATFORM=trevorj/salty-whales:trusty OS_VERSION=mitaka SUITE=storwize_single
