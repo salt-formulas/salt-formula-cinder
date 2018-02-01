@@ -1,3 +1,9 @@
+salt-formula-cinder (2016.12.1-2xenial1) xenial; urgency=medium
+
+  * Add preinst, postinst, postrm procedures to process files/pike symlink
+
+ -- oiurchenko <oiurchenko@mirantis.com>  Mon, 05 Feb 2018 12:11:16 +0200
+
 salt-formula-cinder (2016.12.1-1xenial1) xenial; urgency=medium
 
   * Ubuntu xenial build

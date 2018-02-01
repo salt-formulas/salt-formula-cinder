@@ -1,0 +1,10 @@
+#!/bin/sh
+
+set -e
+
+dpkg-maintscript-helper symlink_to_dir \
+        /usr/share/salt-formulas/env/cinder/files/pike /usr/share/salt-formulas/env/cinder/files/ocata 2016.12.1+201801301708.7afc8cc-1xenial1 salt-formula-cinder -- "$@"
+
+#DEBHELPER#
+
+exit 0
