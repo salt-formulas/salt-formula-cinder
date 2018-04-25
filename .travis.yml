@@ -20,72 +20,73 @@ install:
   - bundle install
 
 env:
-    - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-xenial-salt-2016.3 OS_VERSION=mitaka SUITE=ceph-single
-    - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-xenial-salt-2016.3 OS_VERSION=mitaka SUITE=control-cluster
-    - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-xenial-salt-2016.3 OS_VERSION=mitaka SUITE=control-single
-    - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-xenial-salt-2016.3 OS_VERSION=mitaka SUITE=gpfs-single
-    - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-xenial-salt-2016.3 OS_VERSION=mitaka SUITE=hp3par-single
-    - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-xenial-salt-2016.3 OS_VERSION=mitaka SUITE=lefthand-single
-    - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-xenial-salt-2016.3 OS_VERSION=mitaka SUITE=solidfire-single
-    - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-xenial-salt-2016.3 OS_VERSION=mitaka SUITE=storwize-single
-    - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-xenial-salt-2016.3 OS_VERSION=mitaka SUITE=volume-single
-    - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-xenial-salt-2016.3 OS_VERSION=mitaka SUITE=vsp-single
-    - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-xenial-salt-2016.3 OS_VERSION=mitaka SUITE=volume-single-barbican
-    - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-xenial-salt-2016.3 OS_VERSION=mitaka SUITE=ceph-single
-    - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-xenial-salt-2016.3 OS_VERSION=mitaka SUITE=control-cluster
-    - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-xenial-salt-2016.3 OS_VERSION=mitaka SUITE=control-single
-    - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-xenial-salt-2016.3 OS_VERSION=mitaka SUITE=gpfs-single
-    - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-xenial-salt-2016.3 OS_VERSION=mitaka SUITE=hp3par-single
-    - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-xenial-salt-2016.3 OS_VERSION=mitaka SUITE=lefthand-single
-    - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-xenial-salt-2016.3 OS_VERSION=mitaka SUITE=solidfire-single
-    - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-xenial-salt-2016.3 OS_VERSION=mitaka SUITE=storwize-single
-    - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-xenial-salt-2016.3 OS_VERSION=mitaka SUITE=volume-single
-    - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-xenial-salt-2016.3 OS_VERSION=mitaka SUITE=vsp-single
-    - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-xenial-salt-2016.3 OS_VERSION=mitaka SUITE=volume-single-barbican
-    - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-xenial-salt-2017.7 OS_VERSION=ocata SUITE=ceph-single
-    - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-xenial-salt-2017.7 OS_VERSION=ocata SUITE=control-cluster
-    - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-xenial-salt-2017.7 OS_VERSION=ocata SUITE=control-single
-    - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-xenial-salt-2017.7 OS_VERSION=ocata SUITE=gpfs-single
-    - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-xenial-salt-2017.7 OS_VERSION=ocata SUITE=hp3par-single
-    - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-xenial-salt-2017.7 OS_VERSION=ocata SUITE=lefthand-single
-    - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-xenial-salt-2017.7 OS_VERSION=ocata SUITE=solidfire-single
-    - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-xenial-salt-2017.7 OS_VERSION=ocata SUITE=storwize-single
-    - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-xenial-salt-2017.7 OS_VERSION=ocata SUITE=volume-single
-    - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-xenial-salt-2017.7 OS_VERSION=ocata SUITE=vsp-single
-    - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-xenial-salt-2017.7 OS_VERSION=ocata SUITE=volume-single-barbican
-    - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-xenial-salt-2017.7 OS_VERSION=ocata SUITE=ceph-single
-    - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-xenial-salt-2017.7 OS_VERSION=ocata SUITE=control-cluster
-    - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-xenial-salt-2017.7 OS_VERSION=ocata SUITE=control-single
-    - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-xenial-salt-2017.7 OS_VERSION=ocata SUITE=gpfs-single
-    - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-xenial-salt-2017.7 OS_VERSION=ocata SUITE=hp3par-single
-    - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-xenial-salt-2017.7 OS_VERSION=ocata SUITE=lefthand-single
-    - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-xenial-salt-2017.7 OS_VERSION=ocata SUITE=solidfire-single
-    - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-xenial-salt-2017.7 OS_VERSION=ocata SUITE=storwize-single
-    - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-xenial-salt-2017.7 OS_VERSION=ocata SUITE=volume-single
-    - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-xenial-salt-2017.7 OS_VERSION=ocata SUITE=vsp-single
-    - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-xenial-salt-2017.7 OS_VERSION=ocata SUITE=volume-single-barbican
-    # - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-bionic-salt-2017.7 OS_VERSION=ocata SUITE=ceph-single
-    # - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-bionic-salt-2017.7 OS_VERSION=ocata SUITE=control-cluster
-    # - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-bionic-salt-2017.7 OS_VERSION=ocata SUITE=control-single
-    # - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-bionic-salt-2017.7 OS_VERSION=ocata SUITE=gpfs-single
-    # - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-bionic-salt-2017.7 OS_VERSION=ocata SUITE=hp3par-single
-    # - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-bionic-salt-2017.7 OS_VERSION=ocata SUITE=lefthand-single
-    # - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-bionic-salt-2017.7 OS_VERSION=ocata SUITE=solidfire-single
-    # - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-bionic-salt-2017.7 OS_VERSION=ocata SUITE=storwize-single
-    # - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-bionic-salt-2017.7 OS_VERSION=ocata SUITE=volume-single
-    # - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-bionic-salt-2017.7 OS_VERSION=ocata SUITE=vsp-single
-    # - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-bionic-salt-2017.7 OS_VERSION=ocata SUITE=volume-single-barbican
-    # - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-bionic-salt-2017.7 OS_VERSION=ocata SUITE=ceph-single
-    # - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-bionic-salt-2017.7 OS_VERSION=ocata SUITE=control-cluster
-    # - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-bionic-salt-2017.7 OS_VERSION=ocata SUITE=control-single
-    # - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-bionic-salt-2017.7 OS_VERSION=ocata SUITE=gpfs-single
-    # - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-bionic-salt-2017.7 OS_VERSION=ocata SUITE=hp3par-single
-    # - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-bionic-salt-2017.7 OS_VERSION=ocata SUITE=lefthand-single
-    # - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-bionic-salt-2017.7 OS_VERSION=ocata SUITE=solidfire-single
-    # - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-bionic-salt-2017.7 OS_VERSION=ocata SUITE=storwize-single
-    # - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-bionic-salt-2017.7 OS_VERSION=ocata SUITE=volume-single
-    # - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-bionic-salt-2017.7 OS_VERSION=ocata SUITE=vsp-single
-    # - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-bionic-salt-2017.7 OS_VERSION=ocata SUITE=volume-single-barbican
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2016.3 OS_VERSION=mitaka SUITE=ceph-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2016.3 OS_VERSION=mitaka SUITE=control-cluster
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2016.3 OS_VERSION=mitaka SUITE=control-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2016.3 OS_VERSION=mitaka SUITE=gpfs-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2016.3 OS_VERSION=mitaka SUITE=hp3par-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2016.3 OS_VERSION=mitaka SUITE=lefthand-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2016.3 OS_VERSION=mitaka SUITE=solidfire-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2016.3 OS_VERSION=mitaka SUITE=storwize-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2016.3 OS_VERSION=mitaka SUITE=volume-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2016.3 OS_VERSION=mitaka SUITE=vsp-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2016.3 OS_VERSION=mitaka SUITE=volume-single-barbican
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2017.7 OS_VERSION=ocata SUITE=ceph-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2017.7 OS_VERSION=ocata SUITE=control-cluster
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2017.7 OS_VERSION=ocata SUITE=control-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2017.7 OS_VERSION=ocata SUITE=gpfs-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2017.7 OS_VERSION=ocata SUITE=lefthand-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2017.7 OS_VERSION=ocata SUITE=storwize-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2017.7 OS_VERSION=ocata SUITE=volume-single-barbican
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2017.7 OS_VERSION=pike SUITE=ceph-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2017.7 OS_VERSION=pike SUITE=control-cluster
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2017.7 OS_VERSION=pike SUITE=control-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2017.7 OS_VERSION=pike SUITE=hp3par-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2017.7 OS_VERSION=pike SUITE=solidfire-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2017.7 OS_VERSION=pike SUITE=volume-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2017.7 OS_VERSION=pike SUITE=vsp-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2018.3 OS_VERSION=ocata SUITE=ceph-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2018.3 OS_VERSION=ocata SUITE=control-cluster
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2018.3 OS_VERSION=ocata SUITE=control-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2018.3 OS_VERSION=ocata SUITE=hp3par-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2018.3 OS_VERSION=ocata SUITE=solidfire-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2018.3 OS_VERSION=ocata SUITE=volume-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2018.3 OS_VERSION=ocata SUITE=vsp-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2018.3 OS_VERSION=pike SUITE=ceph-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2018.3 OS_VERSION=pike SUITE=control-cluster
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2018.3 OS_VERSION=pike SUITE=control-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2018.3 OS_VERSION=pike SUITE=gpfs-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2018.3 OS_VERSION=pike SUITE=lefthand-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2018.3 OS_VERSION=pike SUITE=storwize-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2018.3 OS_VERSION=pike SUITE=volume-single-barbican
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2017.7 OS_VERSION=ocata SUITE=ceph-single
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2017.7 OS_VERSION=ocata SUITE=control-cluster
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2017.7 OS_VERSION=ocata SUITE=control-single
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2017.7 OS_VERSION=ocata SUITE=hp3par-single
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2017.7 OS_VERSION=ocata SUITE=solidfire-single
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2017.7 OS_VERSION=ocata SUITE=volume-single
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2017.7 OS_VERSION=ocata SUITE=vsp-single
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2017.7 OS_VERSION=pike SUITE=ceph-single
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2017.7 OS_VERSION=pike SUITE=control-cluster
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2017.7 OS_VERSION=pike SUITE=control-single
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2017.7 OS_VERSION=pike SUITE=gpfs-single
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2017.7 OS_VERSION=pike SUITE=lefthand-single
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2017.7 OS_VERSION=pike SUITE=storwize-single
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2017.7 OS_VERSION=pike SUITE=volume-single-barbican
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2018.3 OS_VERSION=ocata SUITE=ceph-single
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2018.3 OS_VERSION=ocata SUITE=control-cluster
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2018.3 OS_VERSION=ocata SUITE=control-single
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2018.3 OS_VERSION=ocata SUITE=hp3par-single
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2018.3 OS_VERSION=ocata SUITE=solidfire-single
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2018.3 OS_VERSION=ocata SUITE=volume-single
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2018.3 OS_VERSION=ocata SUITE=vsp-single
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2018.3 OS_VERSION=pike SUITE=ceph-single
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2018.3 OS_VERSION=pike SUITE=control-cluster
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2018.3 OS_VERSION=pike SUITE=control-single
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2018.3 OS_VERSION=pike SUITE=gpfs-single
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2018.3 OS_VERSION=pike SUITE=lefthand-single
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2018.3 OS_VERSION=pike SUITE=storwize-single
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2018.3 OS_VERSION=pike SUITE=volume-single-barbican
 
 before_script:
   - set -o pipefail
