@@ -56,6 +56,9 @@ mysql_ca_cinder_volume:
   file.managed:
   - source: salt://cinder/files/{{ volume.version }}/cinder.conf.volume.{{ grains.os_family }}
   - template: jinja
+  - mode: 0640
+  - user: root
+  - group: cinder
   - require:
     - pkg: cinder_volume_packages
 
@@ -63,6 +66,8 @@ mysql_ca_cinder_volume:
   file.managed:
   - source: salt://cinder/files/{{ volume.version }}/api-paste.ini.volume.{{ grains.os_family }}
   - template: jinja
+  - mode: 0640
+  - group: cinder
   - require:
     - pkg: cinder_volume_packages
 
@@ -133,7 +138,8 @@ cinder_volume_fluentd_logger_package:
     - source: salt://oslo_templates/files/logging/_logging.conf
     - template: jinja
     - makedirs: True
-    - user: cinder
+    - mode: 0640
+    - user: root
     - group: cinder
     - defaults:
         service_name: {{ service_name }}
@@ -184,6 +190,8 @@ cinder_volume_services:
   - defaults:
       backend: {{ backend|yaml }}
   - template: jinja
+  - mode: 0640
+  - group: cinder
   - require:
     - pkg: cinder_volume_packages
 
@@ -265,6 +273,8 @@ cinder_driver_fujitsu_{{ loop.index }}:
   file.managed:
   - source: salt://cinder/files/{{ volume.version }}/cinder_fujitsu_eternus_dx.xml
   - template: jinja
+  - mode: 0640
+  - group: cinder
   - defaults:
       backend_name: "{{ backend_name }}"
   - require:

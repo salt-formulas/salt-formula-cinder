@@ -24,6 +24,9 @@ cinder_controller_packages:
   file.managed:
   - source: salt://cinder/files/{{ controller.version }}/cinder.conf.controller.{{ grains.os_family }}
   - template: jinja
+  - mode: 0640
+  - user: root
+  - group: cinder
   - require:
     - pkg: cinder_controller_packages
   - require_in:
@@ -33,6 +36,8 @@ cinder_controller_packages:
   file.managed:
   - source: salt://cinder/files/{{ controller.version }}/api-paste.ini.controller.{{ grains.os_family }}
   - template: jinja
+  - mode: 0640
+  - group: cinder
   - require:
     - pkg: cinder_controller_packages
   - require_in:
@@ -82,7 +87,8 @@ cinder_general_logging_conf:
     - name: /etc/cinder/logging.conf
     - source: salt://oslo_templates/files/logging/_logging.conf
     - template: jinja
-    - user: cinder
+    - mode: 0640
+    - user: root
     - group: cinder
     - defaults:
         service_name: cinder
@@ -111,7 +117,8 @@ cinder_general_logging_conf:
     - source: salt://oslo_templates/files/logging/_logging.conf
     - template: jinja
     - makedirs: True
-    - user: cinder
+    - mode: 0640
+    - user: root
     - group: cinder
     - defaults:
         service_name: {{ service_name }}
@@ -318,6 +325,8 @@ cinder_controller_services:
   - defaults:
       backend: {{ backend|yaml }}
   - template: jinja
+  - mode: 0640
+  - group: cinder
   - require:
     - pkg: cinder_controller_packages
 
@@ -404,6 +413,5 @@ mysql_ca_cinder_controller:
    - name: {{ controller.database.ssl.get('cacert_file', controller.cacert_file) }}
 {%- endif %}
 {%- endif %}
-
 
 {%- endif %}
