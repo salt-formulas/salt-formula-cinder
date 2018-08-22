@@ -1,5 +1,9 @@
 {%- from "cinder/map.jinja" import volume with context %}
+
 {%- if volume.enabled %}
+
+include:
+  - cinder._ssl.volume-mysql
 
 {%- if not pillar.cinder.get('controller', {}).get('enabled', False) %}
 {%- set user = volume %}
@@ -34,20 +38,6 @@ rabbitmq_ca_cinder_volume:
 {%- endif %}
 {%- endif %}
 
-{%- if volume.database.get('ssl',{}).get('enabled', False) %}
-mysql_ca_cinder_volume:
-{%- if volume.database.ssl.cacert is defined %}
-  file.managed:
-    - name: {{ volume.database.ssl.cacert_file }}
-    - contents_pillar: cinder:volume:database:ssl:cacert
-    - mode: 0444
-    - makedirs: true
-{%- else %}
-  file.exists:
-   - name: {{ volume.database.ssl.get('cacert_file', volume.cacert_file) }}
-{%- endif %}
-{%- endif %}
-
 {%- set cinder_log_services = volume.services %}
 
 {%- if not pillar.cinder.get('controller', {}).get('enabled', False) %}
@@ -60,6 +50,7 @@ mysql_ca_cinder_volume:
   - user: root
   - group: cinder
   - require:
+    - sls: cinder._ssl.volume-mysql
     - pkg: cinder_volume_packages
 
 /etc/cinder/api-paste.ini:
@@ -88,12 +79,11 @@ cinder_backup_services:
   {%- if grains.get('noservices') %}
   - onlyif: /bin/false
   {%- endif %}
+  - require:
+    - sls: cinder._ssl.volume-mysql
   - watch:
     {%- if volume.message_queue.get('ssl',{}).get('enabled', False) %}
     - file: rabbitmq_ca_cinder_volume
-    {%- endif %}
-    {%- if volume.database.get('ssl',{}).get('enabled', False) %}
-    - file: mysql_ca_cinder_volume
     {%- endif %}
     - file: /etc/cinder/cinder.conf
     - file: /etc/cinder/api-paste.ini
@@ -168,12 +158,11 @@ cinder_volume_services:
   {%- if grains.get('noservices') %}
   - onlyif: /bin/false
   {%- endif %}
+  - require:
+    - sls: cinder._ssl.volume-mysql
   - watch:
     {%- if volume.message_queue.get('ssl',{}).get('enabled', False) %}
     - file: rabbitmq_ca_cinder_volume
-    {%- endif %}
-    {%- if volume.database.get('ssl',{}).get('enabled', False) %}
-    - file: mysql_ca_cinder_volume
     {%- endif %}
     - file: /etc/cinder/cinder.conf
     - file: /etc/cinder/api-paste.ini

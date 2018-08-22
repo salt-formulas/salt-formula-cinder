@@ -1,5 +1,12 @@
 {%- from "cinder/map.jinja" import controller with context %}
 
+{%- set connection_x509_ssl_option = '' %}
+{%- if controller.database.get('x509',{}).get('enabled',False) %}
+  {%- set connection_x509_ssl_option = '&ssl_ca=' ~ controller.database.x509.ca_file ~ '&ssl_cert=' ~ controller.database.x509.cert_file ~ '&ssl_key=' ~ controller.database.x509.key_file %}
+{%- elif controller.database.get('ssl',{}).get('enabled',False) %}
+  {%- set connection_x509_ssl_option = '&ssl_ca=' ~ controller.database.ssl.get('cacert_file', controller.cacert_file) %}
+{%- endif %}
+
 [DEFAULT]
 rootwrap_config = /etc/cinder/rootwrap.conf
 api_paste_confg = /etc/cinder/api-paste.ini
@@ -203,7 +210,7 @@ idle_timeout=3600
 max_pool_size=30
 max_retries=-1
 max_overflow=40
-connection = {{ controller.database.engine }}+pymysql://{{ controller.database.user }}:{{ controller.database.password }}@{{ controller.database.host }}/{{ controller.database.name }}?charset=utf8{%- if controller.database.get('ssl',{}).get('enabled',False) %}&ssl_ca={{ controller.database.ssl.get('cacert_file', controller.cacert_file) }}{% endif %}
+connection = {{ controller.database.engine }}+pymysql://{{ controller.database.user }}:{{ controller.database.password }}@{{ controller.database.host }}/{{ controller.database.name }}?charset=utf8{{ connection_x509_ssl_option|string }}
 
 {%- if controller.backend is defined %}
 

@@ -762,8 +762,40 @@ To configure this functionality with pillar:
           ossyslog:
             enabled: true
 
-**Documentation and bugs**
+Enable x509 and ssl communication between Cinder and Galera cluster.
+---------------------
+By default communication between Cinder and Galera is unsecure.
 
+You able to set custom certificates in pillar:
+controller:
+  database:
+    x509:
+      enabled: True
+
+volume:
+  database:
+    x509:
+      enabled: True
+
+cinder:
+  controller:
+    database:
+      x509:
+        cacert (certificate content)
+        cert (certificate content)
+        key (certificate content)
+  volume:
+    database:
+      x509:
+        cacert (certificate content)
+        cert (certificate content)
+        key (certificate content)
+
+You can read more about it here:
+    https://docs.openstack.org/security-guide/databases/database-access-control.html
+
+**Documentation and bugs**
+======================
 * http://salt-formulas.readthedocs.io/
    Learn how to install and update salt-formulas
 

@@ -1,5 +1,12 @@
 {%- from "cinder/map.jinja" import volume with context %}
 
+{%- set connection_x509_ssl_option = '' %}
+{%- if volume.database.get('x509',{}).get('enabled',False) %}
+  {%- set connection_x509_ssl_option = '&ssl_ca=' ~ volume.database.x509.ca_file ~ '&ssl_cert=' ~ volume.database.x509.cert_file ~ '&ssl_key=' ~ volume.database.x509.key_file %}
+{%- elif volume.database.get('ssl',{}).get('enabled',False) %}
+  {%- set connection_x509_ssl_option = '&ssl_ca=' ~ volume.database.ssl.get('cacert_file', volume.cacert_file) %}
+{%- endif %}
+
 [DEFAULT]
 rootwrap_config = /etc/cinder/rootwrap.conf
 api_paste_confg = /etc/cinder/api-paste.ini
@@ -189,7 +196,7 @@ idle_timeout=3600
 max_pool_size=30
 max_retries=-1
 max_overflow=40
-connection = {{ volume.database.engine }}+pymysql://{{ volume.database.user }}:{{ volume.database.password }}@{{ volume.database.host }}/{{ volume.database.name }}?charset=utf8{%- if volume.database.get('ssl',{}).get('enabled',False) %}&ssl_ca={{ volume.database.ssl.get('cacert_file', volume.cacert_file) }}{% endif %}
+connection = {{ volume.database.engine }}+pymysql://{{ volume.database.user }}:{{ volume.database.password }}@{{ volume.database.host }}/{{ volume.database.name }}?charset=utf8{{ connection_x509_ssl_option|string }}
 
 {%- if volume.backend is defined %}
 
