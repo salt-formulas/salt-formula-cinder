@@ -341,6 +341,9 @@ cinder_type_create_{{ backend_name }}:
   cinderng.volume_type_present:
   - name: {{ backend.type_name }}
   - profile: {{ credentials }}
+  {%- if controller.get('role', 'primary') == 'secondary' %}
+  - onlyif: /bin/false
+  {%- endif %}
   - require:
     - service: cinder_controller_services
 
@@ -350,6 +353,9 @@ cinder_type_update_{{ backend_name }}:
   - key: volume_backend_name
   - value: {{ backend_name }}
   - profile: {{ credentials }}
+  {%- if controller.get('role', 'primary') == 'secondary' %}
+  - onlyif: /bin/false
+  {%- endif %}
   - require:
     - cinderng: cinder_type_create_{{ backend_name }}
 
