@@ -1,8 +1,10 @@
 {%- set default_params = {
-    'cacert_file': salt['grains.filter_by']({
-        'Debian': '/etc/ssl/certs/ca-certificates.crt',
-        'RedHat': '/etc/pki/tls/certs/ca-bundle.crt'
-    })}
+        'cacert_file': salt['grains.filter_by']({
+            'Debian': '/etc/ssl/certs/ca-certificates.crt',
+            'RedHat': '/etc/pki/tls/certs/ca-bundle.crt'
+        }),
+    'enabled': false,
+    }
 %}
 
 {% set controller = salt['grains.filter_by']({
@@ -150,4 +152,13 @@
         'services_failed_critical_threshold_percent': 0.6,
         'endpoint_failed_major_threshold': 0.5,
     },
-}, grain='os_family', merge=salt['pillar.get']('cinder:monitoring')) %}
+}, grain='os_family', merge=pillar.get('cinder', {}).get('monitoring')) %}
+
+{% set upgrade = pillar.get('cinder', {}).get('upgrade', {}) %}
+
+{# Only for transition untill we split backup service to separate sls #}
+{%- if controller.enabled %}
+{% set backup = controller.get('backup', {}) %}
+{%- elif volume.enabled %}
+{% set backup = volume.get('backup', {}) %}
+{%- endif %}
