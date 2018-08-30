@@ -11,6 +11,7 @@ cinder:
         user: cinder
         secret_uuid: password
         client_cinder_key: password
+        image_volume_cache_enabled: true
     identity:
       engine: keystone
       host: 127.0.0.1
