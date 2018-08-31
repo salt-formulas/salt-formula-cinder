@@ -95,6 +95,8 @@ cinder_general_logging_conf:
         _data: {{ controller.logging }}
     - require:
       - pkg: cinder_controller_packages
+    - require_in:
+      - sls: cinder.db.offline_sync
 {%- if controller.logging.log_handlers.get('fluentd', {}).get('enabled', False) %}
       - pkg: cinder_controller_fluentd_logger_package
 {%- endif %}
