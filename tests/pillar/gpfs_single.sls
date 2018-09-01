@@ -56,10 +56,14 @@ cinder:
         type_name: GPFS-GOLD
         engine: gpfs
         mount_point: '/mnt/gpfs-openstack/cinder/gold'
+        gpfs_images_dir: '/mnt/gpfs-openstack/glance/images'
+        gpfs_images_share_mode: copy_on_write
       GPFS-SILVER:
         type_name: GPFS-SILVER
         engine: gpfs
         mount_point: '/mnt/gpfs-openstack/cinder/silver'
+        gpfs_images_dir: '/mnt/gpfs-openstack/glance/images'
+        gpfs_images_share_mode: copy_on_write
     identity:
       engine: keystone
       host: 127.0.0.1
