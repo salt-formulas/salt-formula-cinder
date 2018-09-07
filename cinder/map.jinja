@@ -77,9 +77,11 @@
     'BaseDefaults': default_params,
     'Debian': {
         'pkgs': ['cinder-volume', 'lvm2', 'sysfsutils', 'sg3-utils', 'python-cinder','python-mysqldb','p7zip', 'gettext-base', 'python-memcache', 'python-pycadf'],
-        'iscsi_pkgs': ['iscsitarget', 'open-iscsi', 'iscsitarget-dkms'],
+        'openiscsi_pkgs': ['open-iscsi', 'tgt'],
+        'iscsitarget_pkgs': ['iscsitarget', 'iscsitarget-dkms'],
         'services': ['cinder-volume'],
-        'iscsi_services': ['iscsitarget', 'open-iscsi'],
+        'iscsitarget_services': ['iscsitarget'],
+        'openiscsi_services': ['open-iscsi', 'tgt', 'iscsid'],
         'wipe_method': 'none',
         'notification': False,
         'audit': {
@@ -108,9 +110,11 @@
     },
     'RedHat': {
         'pkgs': ['openstack-cinder', 'python-cinder', 'lvm2', 'sysfsutils', 'sg3_utils', 'device-mapper-multipath', 'device-mapper-multipath-libs', 'python-pycadf'],
-        'iscsi_pkgs': ['iscsitarget', 'open-iscsi', 'iscsitarget-dkms'],
+        'iscsitarget_pkgs': ['iscsitarget', 'iscsitarget-dkms'],
+        'openiscsi_pkgs': ['open-iscsi', 'tgt'],
+        'iscsitarget_services': ['iscsitarget'],
+        'openiscsi_services': ['open-iscsi', 'tgt', 'iscsid'],
         'services': ['openstack-cinder-volume'],
-        'iscsi_services': ['iscsitarget', 'open-iscsi'],
         'wipe_method': 'none',
         'notification': False,
         'audit': {

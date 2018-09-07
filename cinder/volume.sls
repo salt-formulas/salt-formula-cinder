@@ -191,11 +191,29 @@ cinder_netapp_packages_for_cinder_volume:
 
 {%- endif %}
 
-{%- if backend.engine in ['iscsi' , 'hp_lefthand', 'lvm'] %}
+{%- if backend.engine in ['lvm'] %}
+
+cinder_openiscsi_packages_{{ loop.index }}:
+  pkg.installed:
+  - names: {{ volume.openiscsi_pkgs }}
+  - require:
+    - pkg: cinder_volume_packages
+
+cinder_openiscsi_service:
+  service.running:
+  - names: {{ volume.openiscsi_services }}
+  - enable: true
+  {%- if grains.get('noservices') %}
+  - onlyif: /bin/false
+  {%- endif %}
+  - require:
+    - pkg: cinder_openiscsi_packages_{{ loop.index }}
+
+{%- elif backend.engine in ['iscsi' , 'hp_lefthand'] %}
 
 cinder_iscsi_packages_{{ loop.index }}:
   pkg.installed:
-  - names: {{ volume.iscsi_pkgs }}
+  - names: {{ volume.iscsitarget_pkgs + volume.openiscsi_pkgs }}
   - require:
     - pkg: cinder_volume_packages
 
@@ -208,7 +226,7 @@ cinder_iscsi_packages_{{ loop.index }}:
 
 cinder_scsi_service:
   service.running:
-  - names: {{ volume.iscsi_services }}
+  - names: {{ volume.iscsitarget_services +  volume.openiscsi_services }}
   - enable: true
   {%- if grains.get('noservices') %}
   - onlyif: /bin/false
