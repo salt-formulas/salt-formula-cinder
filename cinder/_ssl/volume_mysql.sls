@@ -2,7 +2,7 @@
 
 cinder_volume_ssl_mysql:
   test.show_notification:
-    - text: "Running cinder._ssl.volume-mysql"
+    - text: "Running cinder._ssl.volume_mysql"
 
 {%- if volume.database.get('x509',{}).get('enabled',False) %}
 
