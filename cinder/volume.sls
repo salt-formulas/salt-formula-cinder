@@ -191,14 +191,11 @@ cinder_netapp_packages_for_cinder_volume:
 
 {%- endif %}
 
-{%- if backend.engine in ['iscsi' , 'hp_lefthand'] %}
+{%- if backend.engine in ['iscsi' , 'hp_lefthand', 'lvm'] %}
 
 cinder_iscsi_packages_{{ loop.index }}:
   pkg.installed:
-  - names:
-    - iscsitarget
-    - open-iscsi
-    - iscsitarget-dkms
+  - names: {{ volume.iscsi_pkgs }}
   - require:
     - pkg: cinder_volume_packages
 
@@ -211,9 +208,7 @@ cinder_iscsi_packages_{{ loop.index }}:
 
 cinder_scsi_service:
   service.running:
-  - names:
-    - iscsitarget
-    - open-iscsi
+  - names: {{ volume.iscsi_services }}
   - enable: true
   {%- if grains.get('noservices') %}
   - onlyif: /bin/false
