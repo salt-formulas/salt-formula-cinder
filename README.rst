@@ -440,6 +440,7 @@ Volume vmware related options:
             ceph_backend:
               type_name: standard-iops
               backend: ceph_backend
+              backend_host: ceph
               pool: volumes
               engine: ceph
               user: cinder

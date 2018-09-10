@@ -4,6 +4,7 @@ cinder:
     version: liberty
     backend:
       ceph_backend:
+        backend_host: ceph
         type_name: standard-iops
         backend: ceph_backend
         pool: volumes
@@ -58,6 +59,7 @@ cinder:
     version: liberty
     backend:
       ceph_backend:
+        backend_host: ceph
         type_name: standard-iops
         backend: ceph_backend
         pool: volumes
