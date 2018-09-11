@@ -94,6 +94,10 @@ volume_name_template = volume-%s
 volumes_dir = /var/lib/cinder/volumes
 log_dir=/var/log/cinder
 
+{%- if controller.logging.log_appender %}
+log_config_append=/etc/cinder/logging.conf
+{%- endif %}
+
 # Use syslog for logging. (boolean value)
 #use_syslog=false
 
