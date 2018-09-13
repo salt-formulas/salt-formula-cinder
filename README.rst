@@ -767,30 +767,31 @@ Enable x509 and ssl communication between Cinder and Galera cluster.
 ---------------------
 By default communication between Cinder and Galera is unsecure.
 
-You able to set custom certificates in pillar:
-controller:
-  database:
-    x509:
-      enabled: True
+cinder:
+  volume:
+    database:
+      x509:
+        enabled: True
+  controller:
+    database:
+      x509:
+        enabled: True
 
-volume:
-  database:
-    x509:
-      enabled: True
+You able to set custom certificates in pillar:
 
 cinder:
   controller:
     database:
       x509:
-        cacert (certificate content)
-        cert (certificate content)
-        key (certificate content)
+        cacert: (certificate content)
+        cert: (certificate content)
+        key: (certificate content)
   volume:
     database:
       x509:
-        cacert (certificate content)
-        cert (certificate content)
-        key (certificate content)
+        cacert: (certificate content)
+        cert: (certificate content)
+        key: (certificate content)
 
 You can read more about it here:
     https://docs.openstack.org/security-guide/databases/database-access-control.html

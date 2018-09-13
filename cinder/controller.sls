@@ -7,7 +7,7 @@ include:
   - apache
   {%- endif %}
   - cinder.db.offline_sync
-  - cinder._ssl.controller-mysql
+  - cinder._ssl.controller_mysql
 
 {%- set user = controller %}
 {%- include "cinder/user.sls" %}
@@ -20,6 +20,7 @@ cinder_controller_packages:
   pkg.installed:
   - names: {{ controller.pkgs }}
   - require_in:
+    - sls: cinder._ssl.controller_mysql
     - sls: cinder.db.offline_sync
 
 /etc/cinder/cinder.conf:
@@ -31,7 +32,7 @@ cinder_controller_packages:
   - group: cinder
   - require:
     - pkg: cinder_controller_packages
-    - sls: cinder._ssl.controller-mysql
+    - sls: cinder._ssl.controller_mysql
   - require_in:
     - sls: cinder.db.offline_sync
 
@@ -43,7 +44,7 @@ cinder_controller_packages:
   - group: cinder
   - require:
     - pkg: cinder_controller_packages
-    - sls: cinder._ssl.controller-mysql
+    - sls: cinder._ssl.controller_mysql
   - require_in:
     - sls: cinder.db.offline_sync
 
@@ -99,7 +100,7 @@ cinder_general_logging_conf:
         _data: {{ controller.logging }}
     - require:
       - pkg: cinder_controller_packages
-      - sls: cinder._ssl.controller-mysql
+      - sls: cinder._ssl.controller_mysql
     - require_in:
       - sls: cinder.db.offline_sync
 {%- if controller.logging.log_handlers.get('fluentd', {}).get('enabled', False) %}
@@ -228,7 +229,7 @@ cinder_api_service:
     - pkg: cinder_controller_packages
     - service: cinder_api_service_dead
     - sls: cinder.db.offline_sync
-    - sls: cinder._ssl.controller-mysql
+    - sls: cinder._ssl.controller_mysql
   - watch:
     {%- if controller.message_queue.get('ssl',{}).get('enabled', False) %}
     - file: rabbitmq_ca_cinder_controller
@@ -250,7 +251,7 @@ cinder_api_service:
   - require:
     - pkg: cinder_controller_packages
     - sls: cinder.db.offline_sync
-    - sls: cinder._ssl.controller-mysql
+    - sls: cinder._ssl.controller_mysql
   - watch:
     {%- if controller.message_queue.get('ssl',{}).get('enabled', False) %}
     - file: rabbitmq_ca_cinder_controller
@@ -282,7 +283,7 @@ cinder_controller_services:
   - require:
     - pkg: cinder_controller_packages
     - sls: cinder.db.offline_sync
-    - sls: cinder._ssl.controller-mysql
+    - sls: cinder._ssl.controller_mysql
   - watch:
     {%- if controller.message_queue.get('ssl',{}).get('enabled', False) %}
     - file: rabbitmq_ca_cinder_controller

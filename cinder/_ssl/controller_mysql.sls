@@ -2,7 +2,7 @@
 
 cinder_controller_ssl_mysql:
   test.show_notification:
-    - text: "Running cinder._ssl.controller-mysql"
+    - text: "Running cinder._ssl.controller_mysql"
 
 {%- if controller.database.get('x509',{}).get('enabled',False) %}
 
