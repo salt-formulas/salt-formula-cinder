@@ -4,6 +4,7 @@
 
 include:
   - cinder._ssl.volume_mysql
+  - cinder._ssl.rabbitmq
 
 {%- if not pillar.cinder.get('controller', {}).get('enabled', False) %}
 {%- set user = volume %}
@@ -15,6 +16,7 @@ cinder_volume_packages:
   - names: {{ volume.pkgs }}
   - require_in:
     - sls: cinder._ssl.volume_mysql
+    - sls: cinder._ssl.rabbitmq
 
 /var/lock/cinder:
   file.directory:
@@ -53,6 +55,7 @@ rabbitmq_ca_cinder_volume:
   - group: cinder
   - require:
     - sls: cinder._ssl.volume_mysql
+    - sls: cinder._ssl.rabbitmq
     - pkg: cinder_volume_packages
 
 /etc/cinder/api-paste.ini:
@@ -83,6 +86,7 @@ cinder_backup_services:
   {%- endif %}
   - require:
     - sls: cinder._ssl.volume_mysql
+    - sls: cinder._ssl.rabbitmq
   - watch:
     {%- if volume.message_queue.get('ssl',{}).get('enabled', False) %}
     - file: rabbitmq_ca_cinder_volume
@@ -162,6 +166,7 @@ cinder_volume_services:
   {%- endif %}
   - require:
     - sls: cinder._ssl.volume_mysql
+    - sls: cinder._ssl.rabbitmq
   - watch:
     {%- if volume.message_queue.get('ssl',{}).get('enabled', False) %}
     - file: rabbitmq_ca_cinder_volume
