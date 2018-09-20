@@ -14,5 +14,6 @@ cinder:
       ceph:
         type_name: standard-iops
         engine: ceph
+        rbd_exclusive_cinder_pool: false
         key:
           conn_speed: fibre-10G

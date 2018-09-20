@@ -67,6 +67,7 @@ cinder:
         user: cinder
         secret_uuid: password
         client_cinder_key: password
+        rbd_exclusive_cinder_pool: true
     identity:
       engine: keystone
       host: 127.0.0.1
