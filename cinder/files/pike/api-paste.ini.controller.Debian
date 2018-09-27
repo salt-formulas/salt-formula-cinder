@@ -25,8 +25,8 @@ keystone_nolimit = cors http_proxy_to_wsgi request_id faultwrap sizelimit osprof
 [composite:openstack_volume_api_v3]
 use = call:cinder.api.middleware.auth:pipeline_factory
 noauth = cors http_proxy_to_wsgi request_id faultwrap sizelimit osprofiler noauth apiv3
-keystone = cors http_proxy_to_wsgi request_id faultwrap sizelimit osprofiler authtoken keystonecontext apiv3
-keystone_nolimit = cors http_proxy_to_wsgi request_id faultwrap sizelimit osprofiler authtoken keystonecontext apiv3
+keystone = cors http_proxy_to_wsgi request_id faultwrap sizelimit osprofiler authtoken keystonecontext {% if controller.audit.enabled %}audit {% endif %}apiv3
+keystone_nolimit = cors http_proxy_to_wsgi request_id faultwrap sizelimit osprofiler authtoken keystonecontext {% if controller.audit.enabled %}audit {% endif %}apiv3
 
 [filter:request_id]
 paste.filter_factory = oslo_middleware.request_id:RequestId.factory
