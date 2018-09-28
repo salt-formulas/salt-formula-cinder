@@ -3,7 +3,7 @@ cinder:
     enabled: true
     version: ocata
     barbican:
-      enabled: true     
+      enabled: true
     osapi:
       host: 127.0.0.1
     database:

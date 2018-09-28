@@ -48,6 +48,15 @@ cinder:
     policy:
       'volume:delete': 'rule:admin_or_owner'
       'volume:extend':
+    cache:
+      engine: memcached
+      members:
+      - host: 127.0.0.1
+        port: 11211
+      security:
+        enabled: true
+        strategy: ENCRYPT
+        secret_key: secret
 apache:
   server:
     enabled: true

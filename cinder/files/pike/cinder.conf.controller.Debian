@@ -201,6 +201,14 @@ cafile={{ controller.identity.get('cacert_file', controller.cacert_file) }}
 #auth_url=http://{{ controller.identity.host }}/identity_v2_admin
 {%- if controller.cache is defined %}
 memcached_servers={%- for member in controller.cache.members %}{{ member.host }}:11211{% if not loop.last %},{% endif %}{%- endfor %}
+  {%- if controller.cache.get('security', {}).get('enabled', False) %}
+memcache_security_strategy = {{ controller.cache.security.get('strategy', 'ENCRYPT') }}
+    {%- if controller.cache.security.secret_key is not defined or not controller.cache.security.secret_key %}
+    {%- do salt.test.exception('controller.cache.security.secret_key is not defined: Please add secret_key') %}
+    {%- else %}
+memcache_secret_key = {{ controller.cache.security.secret_key }}
+    {%- endif %}
+  {%- endif %}
 {%- endif %}
 auth_version = v3
 

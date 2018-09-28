@@ -796,6 +796,46 @@ cinder:
 You can read more about it here:
     https://docs.openstack.org/security-guide/databases/database-access-control.html
 
+Cinder services on compute node with memcached caching and security strategy:
+
+.. code-block:: yaml
+
+    cinder:
+      volume:
+        enabled: true
+        ...
+        cache:
+          engine: memcached
+          members:
+          - host: 127.0.0.1
+            port: 11211
+          - host: 127.0.0.1
+            port: 11211
+          security:
+            enabled: true
+            strategy: ENCRYPT
+            secret_key: secret
+
+Cinder services on controller node with memcached caching and security strategy:
+
+.. code-block:: yaml
+
+    cinder:
+      controller:
+        enabled: true
+        ...
+        cache:
+          engine: memcached
+          members:
+          - host: 127.0.0.1
+            port: 11211
+          - host: 127.0.0.1
+            port: 11211
+          security:
+            enabled: true
+            strategy: ENCRYPT
+            secret_key: secret
+
 Upgrades
 ========
 

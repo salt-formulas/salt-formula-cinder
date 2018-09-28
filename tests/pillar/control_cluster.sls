@@ -50,6 +50,10 @@ cinder:
         port: 11211
       - host: 127.0.0.1
         port: 11211
+      security:
+        enabled: true
+        strategy: ENCRYPT
+        secret_key: secret
     storage:
       engine: storwize
       host: 192.168.0.1

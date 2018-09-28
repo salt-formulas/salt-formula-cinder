@@ -184,6 +184,14 @@ cafile={{ volume.identity.get('cacert_file', volume.cacert_file) }}
 #auth_url=http://{{ volume.identity.host }}/identity_v2_admin
 {%- if volume.cache is defined %}
 memcached_servers={%- for member in volume.cache.members %}{{ member.host }}:11211{% if not loop.last %},{% endif %}{%- endfor %}
+  {%- if volume.cache.get('security', {}).get('enabled', False) %}
+memcache_security_strategy = {{ volume.cache.security.get('strategy', 'ENCRYPT') }}
+    {%- if volume.cache.security.secret_key is not defined or not volume.cache.security.secret_key %}
+    {%- do salt.test.exception('volume.cache.security.secret_key is not defined: Please add secret_key') %}
+    {%- else %}
+memcache_secret_key = {{ volume.cache.security.secret_key }}
+    {%- endif %}
+  {%- endif %}
 {%- endif %}
 auth_version = v3
 
