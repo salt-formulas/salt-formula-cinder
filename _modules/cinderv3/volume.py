@@ -83,7 +83,7 @@ def keys_volume_type_set(volume_type_id, keys=None, **kwargs):
         keys = {}
     cloud_name = kwargs["cloud_name"]
     cur_keys = keys_volume_type_get(
-        volume_type_id, cloud_name=cloud_name)["body"]["extra_specs"]
+        volume_type_id, cloud_name=cloud_name)["extra_specs"]
 
     for k, v in keys.items():
         if (k, v) in cur_keys.items():

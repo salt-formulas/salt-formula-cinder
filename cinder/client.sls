@@ -37,31 +37,31 @@ cinder_client_packages:
 {%- for backend_name, backend in client.get('backend', {}).items() %}
 
 cinder_type_create_{{ backend_name }}:
-  cinderng.volume_type_present:
+  cinderv3.volume_type_present:
   - name: {{ backend.type_name }}
-  - profile: {{ credentials }}
+  - cloud_name: admin_identity
   - require:
     - pkg: cinder_client_packages
 
 cinder_type_update_{{ backend_name }}:
-  cinderng.volume_type_key_present:
+  cinderv3.volume_type_key_present:
   - name: {{ backend.type_name }}
   - key: volume_backend_name
   - value: {{ backend_name }}
-  - profile: {{ credentials }}
+  - cloud_name: admin_identity
   - require:
-    - cinderng: cinder_type_create_{{ backend_name }}
+    - cinderv3: cinder_type_create_{{ backend_name }}
 
 {%- for key_name, key_value in backend.get('key', {}).items() %}
 
 cinder_type_update_{{ backend_name }}_{{ key_name }}:
-  cinderng.volume_type_key_present:
+  cinderv3.volume_type_key_present:
   - name: {{ backend.type_name }}
   - key: {{ key_name }}
   - value: {{ key_value }}
-  - profile: {{ credentials }}
+  - cloud_name: admin_identity
   - require:
-    - cinderng: cinder_type_create_{{ backend_name }}
+    - cinderv3: cinder_type_create_{{ backend_name }}
 
 {%- endfor %}
 

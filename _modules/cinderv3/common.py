@@ -1,6 +1,7 @@
 import six
 import logging
 import uuid
+import time
 
 import os_client_config
 from salt import exceptions
@@ -33,6 +34,8 @@ def send(method):
         @six.wraps(func)
         def wrapped_f(*args, **kwargs):
             cloud_name = kwargs.pop('cloud_name', None)
+            connect_retries = 30
+            connect_retry_delay = 1
             if not cloud_name:
                 raise exceptions.SaltInvocationError(
                     "No cloud_name specified. Please provide cloud_name "
@@ -43,17 +46,29 @@ def send(method):
                 if k.startswith('__'):
                     kwargs.pop(k)
             url, request_kwargs = func(*args, **kwargs)
+            response = None
+            for i in range(connect_retries):
+                try:
+                  response = getattr(adapter, method.lower())(
+                      url, connect_retries=connect_retries,
+                      **request_kwargs)
+                except Exception as e:
+                    if hasattr(e, 'http_status') and (e.http_status >= 500
+                        or e.http_status == 0):
+                        msg = ("Got retriable exception when contacting "
+                               "Cinder API. Sleeping for %ss. Attepmpts "
+                               "%s of %s")
+                        log.error(msg % (connect_retry_delay, i, connect_retries))
+                        time.sleep(connect_retry_delay)
+                        continue
+                break
+            if not response or not response.content:
+                return {}
             try:
-                response = getattr(adapter, method.lower())(url,
-                                                            **request_kwargs)
-            except Exception as e:
-                log.exception("Error occured when executing request")
-                return {"result": False,
-                        "comment": str(e),
-                        "status_code": getattr(e, "http_status", 500)}
-            return {"result": True,
-                    "body": response.json() if response.content else {},
-                    "status_code": response.status_code}
+                resp = response.json()
+            except ValueError:
+                resp = response.content
+            return resp
         return wrapped_f
     return wrap
 
@@ -81,12 +96,12 @@ def get_by_name_or_uuid(resource_list, resp_key):
             else:
                 cloud_name = kwargs['cloud_name']
                 # seems no filtering on volume type name in cinder
-                resp = resource_list(cloud_name=cloud_name)["body"][resp_key]
+                resp = resource_list(cloud_name=cloud_name)[resp_key]
                 # so need to search in list directly
                 for item in resp:
                     if item["name"] == ref:
                         if item_id is not None:
-                            msg = ("Multiple resource: {resource} " 
+                            msg = ("Multiple resource: {resource} "
                                    "with name: {name} found ").format(
                                     resource=resp_key, name=ref)
                             return {"result": False,

@@ -357,9 +357,9 @@ cinder_netapp_add_packages:
 {%- endif %}
 
 cinder_type_create_{{ backend_name }}:
-  cinderng.volume_type_present:
+  cinderv3.volume_type_present:
   - name: {{ backend.type_name }}
-  - profile: {{ credentials }}
+  - cloud_name: admin_identity
   {%- if controller.get('role', 'primary') == 'secondary' %}
   - onlyif: /bin/false
   {%- endif %}
@@ -367,16 +367,16 @@ cinder_type_create_{{ backend_name }}:
     - service: cinder_controller_services
 
 cinder_type_update_{{ backend_name }}:
-  cinderng.volume_type_key_present:
+  cinderv3.volume_type_key_present:
   - name: {{ backend.type_name }}
   - key: volume_backend_name
   - value: {{ backend_name }}
-  - profile: {{ credentials }}
+  - cloud_name: admin_identity
   {%- if controller.get('role', 'primary') == 'secondary' %}
   - onlyif: /bin/false
   {%- endif %}
   - require:
-    - cinderng: cinder_type_create_{{ backend_name }}
+    - cinderv3: cinder_type_create_{{ backend_name }}
 
 {%- endfor %}
 
