@@ -169,7 +169,7 @@ username = {{ controller.identity.user }}
 password = {{ controller.identity.password }}
 auth_uri=http://{{ controller.identity.host }}:5000
 auth_url=http://{{ controller.identity.host }}:35357
-{%- if controller.cache is defined %}
+{%- if controller.get('cache', {}).members is defined %}
 memcached_servers={%- for member in controller.cache.members %}{{ member.host }}:11211{% if not loop.last %},{% endif %}{%- endfor %}
 {%- endif %}
 

@@ -182,7 +182,7 @@ cafile={{ volume.identity.get('cacert_file', volume.cacert_file) }}
 # Temporary disabled for backward compataiblity
 #auth_uri=http://{{ volume.identity.host }}/identity
 #auth_url=http://{{ volume.identity.host }}/identity_v2_admin
-{%- if volume.cache is defined %}
+{%- if volume.get('cache', {}).members is defined %}
 memcached_servers={%- for member in volume.cache.members %}{{ member.host }}:11211{% if not loop.last %},{% endif %}{%- endfor %}
   {%- if volume.cache.get('security', {}).get('enabled', False) %}
 memcache_security_strategy = {{ volume.cache.security.get('strategy', 'ENCRYPT') }}

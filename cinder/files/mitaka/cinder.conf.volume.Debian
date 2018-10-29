@@ -150,7 +150,7 @@ username = {{ volume.identity.user }}
 password = {{ volume.identity.password }}
 auth_uri=http://{{ volume.identity.host }}:5000/v3
 auth_url=http://{{ volume.identity.host }}:35357/v3
-{%- if volume.cache is defined %}
+{%- if volume.get('cache', {}).members is defined %}
 memcached_servers={%- for member in volume.cache.members %}{{ member.host }}:11211{% if not loop.last %},{% endif %}{%- endfor %}
 {%- endif %}
 

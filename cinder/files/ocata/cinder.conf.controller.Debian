@@ -185,7 +185,7 @@ cafile={{ controller.identity.get('cacert_file', controller.cacert_file) }}
 # Temporary disabled for backward compataiblity
 #auth_uri=http://{{ controller.identity.host }}/identity
 #auth_url=http://{{ controller.identity.host }}/identity_v2_admin
-{%- if controller.cache is defined %}
+{%- if controller.get('cache', {}).members is defined %}
 memcached_servers={%- for member in controller.cache.members %}{{ member.host }}:11211{% if not loop.last %},{% endif %}{%- endfor %}
 {%- endif %}
 auth_version = v3
