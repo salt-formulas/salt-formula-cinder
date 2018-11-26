@@ -347,6 +347,16 @@ cinder_netapp_packages:
 
 {%- endif %}
 
+{%- if backend.get('engine') == 'gpfs' %}
+cinder_gpfs_mount_point_base_dir:
+  file.directory:
+  - name: {{ backend.get('mount_point') }}
+  - mode: 0755
+  - user: cinder
+  - group: cinder
+  - makedirs: True
+{%- endif %}
+
 {%- if backend.get('use_multipath_for_image_xfer', False) %}
 
 cinder_netapp_add_packages:
