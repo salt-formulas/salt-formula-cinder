@@ -123,6 +123,11 @@ suites:
       pillars-from-files:
         cinder.sls: tests/pillar/vsp_single.sls
 
+  - name: pure_single
+    provisioner:
+      pillars-from-files:
+        cinder.sls: tests/pillar/pure_single.sls
+
   - name: volume_single_barbican
     provisioner:
       pillars-from-files:
