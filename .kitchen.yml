@@ -8,7 +8,7 @@ provisioner:
   name: salt_solo
   salt_install: bootstrap
   salt_bootstrap_url: https://bootstrap.saltstack.com
-  salt_version: latest
+  salt_version: <%=ENV['SALT_VERSION'] || 'latest'%>
   require_chef: false
   log_level: error
   formula: cinder
@@ -18,6 +18,9 @@ provisioner:
     - name: linux
       repo: git
       source: https://github.com/salt-formulas/salt-formula-linux
+    - name: apache
+      repo: git
+      source: https://github.com/salt-formulas/salt-formula-apache
     - name: keystone
       repo: git
       source: https://github.com/salt-formulas/salt-formula-keystone
@@ -25,6 +28,7 @@ provisioner:
     base:
       "*":
         - linux.system
+        - apache
         - cinder
   pillars:
     top.sls:
@@ -47,9 +51,9 @@ verifier:
   sudo: true
 
 platforms:
-  - name: <%=ENV['PLATFORM'] || 'ubuntu-xenial'%>
+  - name: <%=ENV['PLATFORM'] ||  'saltstack-ubuntu-xenial-salt-stable' %>
     driver_config:
-      image: <%=ENV['PLATFORM'] || 'trevorj/salty-whales:xenial'%>
+      image: <%=ENV['PLATFORM'] || 'epcim/salt:saltstack-ubuntu-xenial-salt-stable'%>
       platform: ubuntu
 
 suites:
@@ -78,6 +82,11 @@ suites:
           cinder:
             volume:
               enabled: false
+
+  - name: control_cluster
+    provisioner:
+      pillars-from-files:
+        cinder.sls: tests/pillar/control_cluster_intree_wsgi.sls
 
   - name: gpfs_single
     provisioner:
@@ -118,5 +127,10 @@ suites:
     provisioner:
       pillars-from-files:
         cinder.sls: tests/pillar/pure_single.sls
+
+  - name: volume_single_barbican
+    provisioner:
+      pillars-from-files:
+        cinder.sls: tests/pillar/volume_single_barbican.sls
 
 # vim: ft=yaml sw=2 ts=2 sts=2 tw=125

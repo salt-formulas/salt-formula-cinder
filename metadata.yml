@@ -4,3 +4,5 @@ source: "https://github.com/salt-formulas/salt-formula-cinder"
 dependencies:
   - name: keystone
     source: "https://github.com/salt-formulas/salt-formula-keystone"
+  - name: apache
+    source: "https://github.com/salt-formulas/salt-formula-apache"

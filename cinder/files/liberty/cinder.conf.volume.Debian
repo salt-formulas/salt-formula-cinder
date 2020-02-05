@@ -39,7 +39,7 @@ volume_backend_name=DEFAULT
 
 default_volume_type={{ volume.default_volume_type }}
 
-enabled_backends={% for backend_name, backend in volume.get('backend', {}).iteritems() %}{{ backend_name }}{% if not loop.last %},{% endif %}{% endfor %}
+enabled_backends={% for backend_name, backend in volume.get('backend', {}).items() %}{{ backend_name }}{% if not loop.last %},{% endif %}{% endfor %}
 
 {%- else %}
 
@@ -57,6 +57,10 @@ storage_availability_zone={{volume.storage_availability_zone}}
 default_availability_zone={{volume.default_availability_zone}}
 {%- endif %}
 
+# Enables the Force option on upload_to_image. This enables running
+# upload_volume on in-use volumes for backends that support it. (boolean value)
+#enable_force_upload = false
+enable_force_upload = {{ volume.get('enable_force_upload', False)|lower }}
 
 #RPC response timeout recommended by Hitachi
 rpc_response_timeout=3600
@@ -167,7 +171,7 @@ connection = {{ volume.database.engine }}+pymysql://{{ volume.database.user }}:{
 
 {%- if volume.backend is defined %}
 
-{%- for backend_name, backend in volume.get('backend', {}).iteritems() %}
+{%- for backend_name, backend in volume.get('backend', {}).items() %}
 
 {%- set backend_fragment = "cinder/files/backend/_" + backend.engine + ".conf" %}
 {%- include backend_fragment %}

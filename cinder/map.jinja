@@ -1,9 +1,14 @@
-{%- set system_cacerts_file = salt['grains.filter_by']({
-    'Debian': '/etc/ssl/certs/ca-certificates.crt',
-    'RedHat': '/etc/pki/tls/certs/ca-bundle.crt'
-})%}
+{%- set default_params = {
+        'cacert_file': salt['grains.filter_by']({
+            'Debian': '/etc/ssl/certs/ca-certificates.crt',
+            'RedHat': '/etc/pki/tls/certs/ca-bundle.crt'
+        }),
+    'enabled': false,
+    }
+%}
 
 {% set controller = salt['grains.filter_by']({
+    'BaseDefaults': default_params,
     'Debian': {
         'pkgs': ['cinder-api', 'cinder-scheduler', 'lvm2', 'python-cinder', 'gettext-base', 'python-memcache', 'python-pycadf'],
         'services': ['cinder-scheduler'],
@@ -13,13 +18,27 @@
         'audit': {
           'enabled': false
         },
-	'cinder_uid': 304,
-	'cinder_gid': 304,
-        'backup': {
-          'pkgs': ['cinder-backup'],
-          'services': ['cinder-backup'],
-          'engine': None
-        }
+       'cinder_uid': 304,
+       'cinder_gid': 304,
+       'message_queue': {
+         'rpc_response_timeout': 3600,
+         'control_exchange': 'cinder'
+       },
+       'enable_proxy_headers_parsing': true,
+         'backup': {
+           'pkgs': ['cinder-backup'],
+           'services': ['cinder-backup'],
+           'engine': None
+        },
+        'logging': {
+          'app_name': 'cinder',
+          'log_appender': false,
+          'log_handlers': {
+            'watchedfile': {
+              'enabled': true
+            }
+          },
+        },
     },
     'RedHat': {
         'pkgs': ['openstack-cinder', 'python-cinder', 'lvm2', 'python-pycadf'],
@@ -30,64 +49,124 @@
         'audit': {
           'enabled': false
         },
-	'cinder_uid': 304,
-	'cinder_gid': 304,
+       'cinder_uid': 304,
+       'cinder_gid': 304,
+       'message_queue': {
+         'rpc_response_timeout': 3600,
+         'control_exchange': 'cinder'
+       },
+       'enable_proxy_headers_parsing': true,
         'backup': {
           'pkgs': ['cinder-backup'],
           'services': ['cinder-backup'],
           'engine': None
-        }
-
+        },
+        'logging': {
+          'app_name': 'cinder',
+          'log_appender': false,
+          'log_handlers': {
+            'watchedfile': {
+              'enabled': true
+            }
+          },
+        },
     },
-}, merge=pillar.cinder.get('controller', {})) %}
+}, merge=pillar.get('cinder', {}).get('controller', {}), base='BaseDefaults') %}
 
 {% set volume = salt['grains.filter_by']({
+    'BaseDefaults': default_params,
     'Debian': {
         'pkgs': ['cinder-volume', 'lvm2', 'sysfsutils', 'sg3-utils', 'python-cinder','python-mysqldb','p7zip', 'gettext-base', 'python-memcache', 'python-pycadf'],
+        'openiscsi_pkgs': ['open-iscsi', 'tgt'],
+        'iscsitarget_pkgs': ['iscsitarget', 'iscsitarget-dkms'],
         'services': ['cinder-volume'],
+        'iscsitarget_services': ['iscsitarget'],
+        'openiscsi_services': ['open-iscsi', 'tgt', 'iscsid'],
         'wipe_method': 'none',
         'notification': False,
         'audit': {
           'enabled': false
         },
-	'cinder_uid': 304,
-	'cinder_gid': 304,
+        'cinder_uid': 304,
+        'cinder_gid': 304,
         'backup': {
           'pkgs': ['cinder-backup'],
           'services': ['cinder-backup'],
           'engine': None
-        }
-
+        },
+        'message_queue': {
+          'rpc_response_timeout': 3600,
+          'control_exchange': 'cinder'
+        },
+        'logging': {
+          'app_name': 'cinder',
+          'log_appender': false,
+          'log_handlers': {
+            'watchedfile': {
+              'enabled': true
+            }
+          },
+        },
     },
     'RedHat': {
         'pkgs': ['openstack-cinder', 'python-cinder', 'lvm2', 'sysfsutils', 'sg3_utils', 'device-mapper-multipath', 'device-mapper-multipath-libs', 'python-pycadf'],
+        'iscsitarget_pkgs': ['iscsitarget', 'iscsitarget-dkms'],
+        'openiscsi_pkgs': ['open-iscsi', 'tgt'],
+        'iscsitarget_services': ['iscsitarget'],
+        'openiscsi_services': ['open-iscsi', 'tgt', 'iscsid'],
         'services': ['openstack-cinder-volume'],
         'wipe_method': 'none',
         'notification': False,
         'audit': {
           'enabled': false
         },
-	'cinder_uid': 304,
-	'cinder_gid': 304,
+        'cinder_uid': 304,
+        'cinder_gid': 304,
+        'message_queue': {
+          'rpc_response_timeout': 3600,
+          'control_exchange': 'cinder'
+        },
         'backup': {
           'pkgs': ['cinder-backup'],
           'services': ['cinder-backup'],
           'engine': None
-        }
+        },
+        'logging': {
+          'app_name': 'cinder',
+          'log_appender': false,
+          'log_handlers': {
+            'watchedfile': {
+              'enabled': true
+            }
+          },
+        },
     },
-}, merge=pillar.cinder.get('volume', {})) %}
+}, merge=pillar.get('cinder', {}).get('volume', {}), base='BaseDefaults') %}
 
 {% set client = salt['grains.filter_by']({
+    'BaseDefaults': default_params,
     'Debian': {
         'pkgs': ['python-cinderclient']
     },
     'RedHat': {
         'pkgs': ['python-cinderclient']
     },
-}, merge=pillar.cinder.get('client', {})) %}
+}, merge=pillar.get('cinder', {}).get('client', {}), base='BaseDefaults') %}
 
 {% set monitoring = salt['grains.filter_by']({
     'default': {
         'error_log_rate': 0.2,
+        'services_failed_warning_threshold_percent': 0.3,
+        'services_failed_critical_threshold_percent': 0.6,
+        'endpoint_failed_major_threshold': 0.5,
     },
-}, grain='os_family', merge=salt['pillar.get']('cinder:monitoring')) %}
+}, grain='os_family', merge=pillar.get('cinder', {}).get('monitoring')) %}
+
+{% set upgrade = pillar.get('cinder', {}).get('upgrade', {}) %}
+
+{# Only for transition untill we split backup service to separate sls #}
+{%- if controller.enabled %}
+{% set backup = controller.get('backup', {}) %}
+{%- elif volume.enabled %}
+{% set backup = volume.get('backup', {}) %}
+{%- endif %}

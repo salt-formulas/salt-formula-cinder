@@ -1,0 +1,44 @@
+salt-formula-cinder (2016.12.1) xenial; urgency=medium
+
+  * Switch using 3.0 native source format
+
+ -- devops <devops@mirantis.com>  Fri, 10 Aug 2018 15:45:04 +0400
+
+salt-formula-cinder (2016.12.1-2xenial1) xenial; urgency=medium
+
+  * Add preinst, postinst, postrm procedures to process files/pike symlink
+
+ -- oiurchenko <oiurchenko@mirantis.com>  Mon, 05 Feb 2018 12:11:16 +0200
+
+salt-formula-cinder (2016.12.1-1xenial1) xenial; urgency=medium
+
+  * Ubuntu xenial build
+
+ -- Filip Pytloun <filip@pytloun.cz>  Tue, 24 Jan 2017 12:21:17 +0100
+
+salt-formula-cinder (2016.12.1-1) unstable; urgency=medium
+
+  * New upstream release
+  * d/{control,copyright}: Use my @debian.org email address
+  * Bumped debhelper version to 10
+
+ -- Ondřej Nový <onovy@debian.org>  Sun, 25 Dec 2016 17:05:43 +0100
+
+salt-formula-cinder (2016.4.1-3) unstable; urgency=medium
+
+  * Added Debian tests
+
+ -- Ondřej Nový <novy@ondrej.org>  Wed, 08 Jun 2016 21:27:14 +0200
+
+salt-formula-cinder (2016.4.1-2) unstable; urgency=medium
+
+  * d/copyright: Added myself to Debian part
+  * Added myself as uploader
+
+ -- Ondřej Nový <novy@ondrej.org>  Wed, 11 May 2016 23:37:04 +0200
+
+salt-formula-cinder (2016.4.1-1) unstable; urgency=medium
+
+  * Initial release (Closes: #821915)
+
+ -- Filip Pytloun <filip@pytloun.cz>  Wed, 20 Apr 2016 16:04:27 +0200

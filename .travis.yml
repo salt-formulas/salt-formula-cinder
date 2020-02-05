@@ -1,3 +1,6 @@
+language: python
+python:
+- "2.7.13"
 sudo: required
 services:
   - docker
@@ -12,40 +15,92 @@ install:
     gem 'test-kitchen'
     gem 'kitchen-docker'
     gem 'kitchen-inspec'
-    gem 'inspec'
+    gem 'inspec', '<3.0.0'
+    #Version was frozen, because of issues in the version of inspec >3.0.0 -- see https://mirantis.jira.com/browse/PROD-24324 for more info
     gem 'kitchen-salt', :git => 'https://github.com/salt-formulas/kitchen-salt.git'
   - bundle install
 
 env:
-    - PLATFORM=trevorj/salty-whales:trusty OS_VERSION=mitaka SUITE=ceph_single
-    - PLATFORM=trevorj/salty-whales:xenial OS_VERSION=ocata SUITE=ceph_single
-    - PLATFORM=trevorj/salty-whales:trusty OS_VERSION=mitaka SUITE=control_cluster
-    - PLATFORM=trevorj/salty-whales:xenial OS_VERSION=ocata SUITE=control_cluster
-    - PLATFORM=trevorj/salty-whales:trusty OS_VERSION=mitaka SUITE=control_single
-    - PLATFORM=trevorj/salty-whales:xenial OS_VERSION=ocata SUITE=control_single
-    - PLATFORM=trevorj/salty-whales:trusty OS_VERSION=mitaka SUITE=gpfs_single
-    - PLATFORM=trevorj/salty-whales:xenial OS_VERSION=ocata SUITE=gpfs_single
-    - PLATFORM=trevorj/salty-whales:trusty OS_VERSION=mitaka SUITE=hp3par_single
-    - PLATFORM=trevorj/salty-whales:xenial OS_VERSION=ocata SUITE=hp3par_single
-    - PLATFORM=trevorj/salty-whales:trusty OS_VERSION=mitaka SUITE=lefthand_single
-    - PLATFORM=trevorj/salty-whales:xenial OS_VERSION=ocata SUITE=lefthand_single
-    - PLATFORM=trevorj/salty-whales:trusty OS_VERSION=mitaka SUITE=pure_single
-    - PLATFORM=trevorj/salty-whales:xenial OS_VERSION=ocata SUITE=pure_single
-    - PLATFORM=trevorj/salty-whales:trusty OS_VERSION=mitaka SUITE=solidfire_single
-    - PLATFORM=trevorj/salty-whales:xenial OS_VERSION=ocata SUITE=solidfire_single
-    - PLATFORM=trevorj/salty-whales:trusty OS_VERSION=mitaka SUITE=storwize_single
-    - PLATFORM=trevorj/salty-whales:xenial OS_VERSION=ocata SUITE=storwize_single
-    - PLATFORM=trevorj/salty-whales:trusty OS_VERSION=mitaka SUITE=volume_single
-    - PLATFORM=trevorj/salty-whales:xenial OS_VERSION=ocata SUITE=volume_single
-    - PLATFORM=trevorj/salty-whales:trusty OS_VERSION=mitaka SUITE=vsp_single
-    - PLATFORM=trevorj/salty-whales:xenial OS_VERSION=ocata SUITE=vsp_single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2016.3 OS_VERSION=mitaka SUITE=ceph-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2016.3 OS_VERSION=mitaka SUITE=control-cluster
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2016.3 OS_VERSION=mitaka SUITE=control-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2016.3 OS_VERSION=mitaka SUITE=gpfs-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2016.3 OS_VERSION=mitaka SUITE=hp3par-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2016.3 OS_VERSION=mitaka SUITE=lefthand-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2016.3 OS_VERSION=mitaka SUITE=pure_single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2016.3 OS_VERSION=mitaka SUITE=solidfire-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2016.3 OS_VERSION=mitaka SUITE=storwize-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2016.3 OS_VERSION=mitaka SUITE=volume-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2016.3 OS_VERSION=mitaka SUITE=vsp-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2016.3 OS_VERSION=mitaka SUITE=volume-single-barbican
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2017.7 OS_VERSION=ocata SUITE=ceph-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2017.7 OS_VERSION=ocata SUITE=control-cluster
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2017.7 OS_VERSION=ocata SUITE=control-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2017.7 OS_VERSION=ocata SUITE=gpfs-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2017.7 OS_VERSION=ocata SUITE=lefthand-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2017.7 OS_VERSION=ocata SUITE=pure_single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2017.7 OS_VERSION=ocata SUITE=storwize-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2017.7 OS_VERSION=ocata SUITE=volume-single-barbican
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2017.7 OS_VERSION=pike SUITE=ceph-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2017.7 OS_VERSION=pike SUITE=control-cluster
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2017.7 OS_VERSION=pike SUITE=control-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2017.7 OS_VERSION=pike SUITE=hp3par-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2017.7 OS_VERSION=pike SUITE=pure_single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2017.7 OS_VERSION=pike SUITE=solidfire-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2017.7 OS_VERSION=pike SUITE=volume-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2017.7 OS_VERSION=pike SUITE=vsp-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2018.3 OS_VERSION=ocata SUITE=ceph-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2018.3 OS_VERSION=ocata SUITE=control-cluster
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2018.3 OS_VERSION=ocata SUITE=control-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2018.3 OS_VERSION=ocata SUITE=hp3par-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2018.3 OS_VERSION=ocata SUITE=pure_single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2018.3 OS_VERSION=ocata SUITE=solidfire-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2018.3 OS_VERSION=ocata SUITE=volume-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2018.3 OS_VERSION=ocata SUITE=vsp-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2018.3 OS_VERSION=pike SUITE=ceph-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2018.3 OS_VERSION=pike SUITE=control-cluster
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2018.3 OS_VERSION=pike SUITE=control-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2018.3 OS_VERSION=pike SUITE=gpfs-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2018.3 OS_VERSION=pike SUITE=lefthand-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2018.3 OS_VERSION=pike SUITE=pure_single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2018.3 OS_VERSION=pike SUITE=storwize-single
+    - PLATFORM=epcim/salt:saltstack-ubuntu-xenial-salt-2018.3 OS_VERSION=pike SUITE=volume-single-barbican
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2017.7 OS_VERSION=ocata SUITE=ceph-single
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2017.7 OS_VERSION=ocata SUITE=control-cluster
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2017.7 OS_VERSION=ocata SUITE=control-single
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2017.7 OS_VERSION=ocata SUITE=hp3par-single
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2017.7 OS_VERSION=ocata SUITE=solidfire-single
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2017.7 OS_VERSION=ocata SUITE=volume-single
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2017.7 OS_VERSION=ocata SUITE=vsp-single
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2017.7 OS_VERSION=pike SUITE=ceph-single
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2017.7 OS_VERSION=pike SUITE=control-cluster
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2017.7 OS_VERSION=pike SUITE=control-single
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2017.7 OS_VERSION=pike SUITE=gpfs-single
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2017.7 OS_VERSION=pike SUITE=lefthand-single
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2017.7 OS_VERSION=pike SUITE=storwize-single
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2017.7 OS_VERSION=pike SUITE=volume-single-barbican
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2018.3 OS_VERSION=ocata SUITE=ceph-single
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2018.3 OS_VERSION=ocata SUITE=control-cluster
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2018.3 OS_VERSION=ocata SUITE=control-single
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2018.3 OS_VERSION=ocata SUITE=hp3par-single
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2018.3 OS_VERSION=ocata SUITE=solidfire-single
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2018.3 OS_VERSION=ocata SUITE=volume-single
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2018.3 OS_VERSION=ocata SUITE=vsp-single
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2018.3 OS_VERSION=pike SUITE=ceph-single
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2018.3 OS_VERSION=pike SUITE=control-cluster
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2018.3 OS_VERSION=pike SUITE=control-single
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2018.3 OS_VERSION=pike SUITE=gpfs-single
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2018.3 OS_VERSION=pike SUITE=lefthand-single
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2018.3 OS_VERSION=pike SUITE=storwize-single
+    # - PLATFORM=epcim/salt:saltstack-ubuntu-bionic-salt-2018.3 OS_VERSION=pike SUITE=volume-single-barbican
 
 before_script:
   - set -o pipefail
   - make test | tail
 
 script:
-  - KITCHEN_LOCAL_YAML=.kitchen.travis.yml bundle exec kitchen test -t tests/integration
+  - test ! -e .kitchen.yml || bundle exec kitchen converge ${SUITE} || true
+  - test ! -e .kitchen.yml || bundle exec kitchen verify ${SUITE} -t tests/integration
 
 notifications:
   webhooks:

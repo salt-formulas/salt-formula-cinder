@@ -1,0 +1,224 @@
+{%- from "cinder/map.jinja" import volume with context %}
+
+{%- set connection_x509_ssl_option = '' %}
+{%- if volume.database.get('x509',{}).get('enabled',False) %}
+  {%- set connection_x509_ssl_option = '&ssl_ca=' ~ volume.database.x509.ca_file ~ '&ssl_cert=' ~ volume.database.x509.cert_file ~ '&ssl_key=' ~ volume.database.x509.key_file %}
+{%- elif volume.database.get('ssl',{}).get('enabled',False) %}
+  {%- set connection_x509_ssl_option = '&ssl_ca=' ~ volume.database.ssl.get('cacert_file', volume.cacert_file) %}
+{%- endif %}
+
+[DEFAULT]
+rootwrap_config = /etc/cinder/rootwrap.conf
+api_paste_confg = /etc/cinder/api-paste.ini
+
+iscsi_helper = tgtadm
+volume_name_template = volume-%s
+#volume_group = cinder
+
+verbose = True
+
+osapi_volume_workers = {{ volume.get('volume_workers', '4') }}
+
+auth_strategy = keystone
+
+state_path = /var/lib/cinder
+
+use_syslog=False
+
+glance_num_retries=0
+debug=False
+
+os_region_name={{ volume.identity.region }}
+
+#glance_api_ssl_compression=False
+#glance_api_insecure=False
+
+osapi_volume_listen={{ volume.osapi.host }}
+
+glance_api_servers = {{ volume.glance.get('protocol','http') }}://{{ volume.glance.host }}:{{ volume.glance.port }}
+{%- if volume.glance.get('protocol','http') == 'https' %}
+glance_ca_certificates_file = {{ volume.glance.get('cacert_file', volume.cacert_file) }}
+{%- endif %}
+
+
+glance_host={{ volume.glance.host }}
+glance_port={{ volume.glance.port }}
+glance_api_version=2
+
+os_privileged_user_name={{ volume.identity.user }}
+os_privileged_user_password={{ volume.identity.password }}
+os_privileged_user_tenant={{ volume.identity.tenant }}
+os_privileged_user_auth_url={{ volume.identity.get('protocol','http') }}://{{ volume.identity.host }}:5000/v3/
+
+volume_backend_name=DEFAULT
+
+{%- if volume.backend is defined %}
+
+default_volume_type={{ volume.default_volume_type }}
+
+enabled_backends={% for backend_name, backend in volume.get('backend', {}).items() %}{{ backend_name }}{% if not loop.last %},{% endif %}{% endfor %}
+
+{%- endif %}
+
+{%- if volume.storage_availability_zone is defined %}
+storage_availability_zone={{volume.storage_availability_zone}}
+{%- endif %}
+
+{%- if volume.default_availability_zone is defined %}
+default_availability_zone={{volume.default_availability_zone}}
+{%- endif %}
+
+# Enables the Force option on upload_to_image. This enables running
+# upload_volume on in-use volumes for backends that support it. (boolean value)
+#enable_force_upload = false
+enable_force_upload = {{ volume.get('enable_force_upload', False)|lower }}
+
+#RPC response timeout recommended by Hitachi
+rpc_response_timeout=3600
+
+#Rabbit
+control_exchange=cinder
+
+
+volume_clear={{ volume.wipe_method }}
+
+
+volume_name_template = volume-%s
+
+#volume_group = vg_cinder_volume
+
+volumes_dir = /var/lib/cinder/volumes
+log_dir=/var/log/cinder
+
+# Use syslog for logging. (boolean value)
+#use_syslog=false
+
+use_syslog=false
+verbose=True
+
+nova_catalog_admin_info = compute:nova:adminURL
+nova_catalog_info = compute:nova:{{ volume.identity.get('endpoint_type', 'publicURL') }}
+
+{%- set rabbit_port = volume.message_queue.get('port', 5671 if volume.message_queue.get('ssl',{}).get('enabled', False)  else 5672) %}
+{%- if volume.message_queue.members is defined %}
+transport_url = rabbit://{% for member in volume.message_queue.members -%}
+                             {{ volume.message_queue.user }}:{{ volume.message_queue.password }}@{{ member.host }}:{{ member.get('port',rabbit_port) }}
+                             {%- if not loop.last -%},{%- endif -%}
+                         {%- endfor -%}
+                             /{{ volume.message_queue.virtual_host }}
+{%- else %}
+transport_url = rabbit://{{ volume.message_queue.user }}:{{ volume.message_queue.password }}@{{ volume.message_queue.host }}:{{ rabbit_port }}/{{ volume.message_queue.virtual_host }}
+{%- endif %}
+
+{%- if volume.backup.engine != None %}
+{%- set backup_backend_fragment = "cinder/files/backup_backend/_" + volume.backup.engine + ".conf" %}
+{%- include backup_backend_fragment %}
+{%- endif %}
+{%- if volume.nas_secure_file_permissions is defined %}
+nas_secure_file_permissions={{ volume.nas_secure_file_permissions }}
+{%- endif %}
+{%- if volume.nas_secure_file_operations is defined %}
+nas_secure_file_operations={{ volume.nas_secure_file_operations }}
+{%- endif %}
+{%- if volume.cinder_internal_tenant_user_id is defined %}
+cinder_internal_tenant_user_id={{ volume.cinder_internal_tenant_user_id }}
+{%- endif %}
+{%- if volume.cinder_internal_tenant_project_id is defined %}
+cinder_internal_tenant_project_id={{ volume.cinder_internal_tenant_project_id }}
+{%- endif %}
+
+[oslo_messaging_notifications]
+{%- if volume.notification is mapping %}
+driver = {{ volume.notification.get('driver', 'messagingv2') }}
+{%- if volume.notification.topics is defined %}
+topics = {{ volume.notification.topics }}
+{%- endif %}
+{%- elif volume.notification %}
+driver = messagingv2
+{%- endif %}
+
+[oslo_concurrency]
+
+lock_path=/var/lock/cinder
+
+[oslo_middleware]
+
+enable_proxy_headers_parsing = True
+
+{%- if volume.message_queue.get('ssl',{}).get('enabled', False) %}
+[oslo_messaging_rabbit]
+rabbit_use_ssl=true
+
+  {%- if volume.message_queue.ssl.version is defined %}
+kombu_ssl_version = {{ volume.message_queue.ssl.version }}
+  {%- elif salt['grains.get']('pythonversion') > [2,7,8] %}
+kombu_ssl_version = TLSv1_2
+  {%- endif %}
+
+  {%- if volume.message_queue.get('x509',{}).get('enabled', False) %}
+kombu_ssl_ca_certs = {{ volume.message_queue.x509.ca_file }}
+kombu_ssl_keyfile = {{ volume.message_queue.x509.key_file }}
+kombu_ssl_certfile = {{ volume.message_queue.x509.cert_file }}
+  {%- else %}
+kombu_ssl_ca_certs = {{ volume.message_queue.ssl.get('cacert_file', volume.cacert_file) }}
+  {%- endif %}
+{%- endif %}
+
+[keystone_authtoken]
+signing_dir=/tmp/keystone-signing-cinder
+revocation_cache_time = 10
+auth_type = password
+user_domain_name = {{ volume.identity.get('domain', 'Default') }}
+project_domain_name = {{ volume.identity.get('domain', 'Default') }}
+project_name = {{ volume.identity.tenant }}
+username = {{ volume.identity.user }}
+password = {{ volume.identity.password }}
+auth_uri={{ volume.identity.get('protocol', 'http') }}://{{ volume.identity.host }}:5000
+auth_url={{ volume.identity.get('protocol', 'http') }}://{{ volume.identity.host }}:35357
+{%- if volume.identity.get('protocol', 'http') == 'https' %}
+cafile={{ volume.identity.get('cacert_file', volume.cacert_file) }}
+{%- endif %}
+
+# Temporary disabled for backward compataiblity
+#auth_uri=http://{{ volume.identity.host }}/identity
+#auth_url=http://{{ volume.identity.host }}/identity_v2_admin
+{%- if volume.get('cache', {}).members is defined %}
+memcached_servers={%- for member in volume.cache.members %}{{ member.host }}:11211{% if not loop.last %},{% endif %}{%- endfor %}
+  {%- if volume.cache.get('security', {}).get('enabled', False) %}
+memcache_security_strategy = {{ volume.cache.security.get('strategy', 'ENCRYPT') }}
+    {%- if volume.cache.security.secret_key is not defined or not volume.cache.security.secret_key %}
+    {%- do salt.test.exception('volume.cache.security.secret_key is not defined: Please add secret_key') %}
+    {%- else %}
+memcache_secret_key = {{ volume.cache.security.secret_key }}
+    {%- endif %}
+  {%- endif %}
+{%- endif %}
+auth_version = v3
+
+{%- if volume.get('barbican', {}).get('enabled', False) %}
+[key_manager]
+api_class = castellan.key_manager.barbican_key_manager.BarbicanKeyManager
+[barbican]
+auth_endpoint = {{ volume.identity.get('protocol', 'http') }}://{{ volume.identity.get('host', 'localhost') }}:{{ volume.identity.get('port', '5000') }}/v3
+{%- if volume.barbican.get('protocol', 'https') %}
+cafile={{ volume.identity.get('cacert_file', volume.cacert_file) }}
+{%- endif %}
+{%- endif %}
+
+[database]
+idle_timeout=3600
+max_pool_size=30
+max_retries=-1
+max_overflow=40
+connection = {{ volume.database.engine }}+pymysql://{{ volume.database.user }}:{{ volume.database.password }}@{{ volume.database.host }}/{{ volume.database.name }}?charset=utf8{{ connection_x509_ssl_option|string }}
+
+{%- if volume.backend is defined %}
+
+{%- for backend_name, backend in volume.get('backend', {}).items() %}
+
+{%- set backend_fragment = "cinder/files/backend/_" + backend.engine + ".conf" %}
+{%- include backend_fragment %}
+
+{%- endfor %}
+
+{%- endif %}

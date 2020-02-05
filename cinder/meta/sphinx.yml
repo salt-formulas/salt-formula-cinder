@@ -24,9 +24,18 @@ doc:
         database_host:
           name: "Database"
           value: {{ controller.database.user }}@{{ controller.database.host }}:{{ controller.database.port }}//{{ controller.database.name }}
+        {%- set rabbit_port = controller.message_queue.get('port', 5671 if controller.message_queue.get('ssl',{}).get('enabled', False)  else 5672) %}
         message_queue_ip:
           name: "Message queue"
-          value: {{ controller.message_queue.user }}@{{ controller.message_queue.host }}:{{ controller.message_queue.port }}{{ controller.message_queue.virtual_host }}
+          {%- if controller.message_queue.members is defined %}
+          value: {% for member in controller.message_queue.members -%}
+                 {{ controller.message_queue.user }}:{{ controller.message_queue.password }}@{{ member.host }}:{{ member.get('port',rabbit_port) }}
+                 {%- if not loop.last -%},{%- endif -%}
+                 {%- endfor -%}
+                 /{{ controller.message_queue.virtual_host }}
+          {%- else %}
+          value:  {{ controller.message_queue.user }}:{{ controller.message_queue.password }}@{{ controller.message_queue.host }}:{{ rabbit_port }}/{{ controller.message_queue.virtual_host }}
+          {%- endif %}
         identity_host:
           name: "Identity service"
           value: {{ controller.identity.user }}@{{ controller.identity.host }}:{{ controller.identity.port }}
@@ -34,12 +43,12 @@ doc:
           value: |
             {%- for pkg in controller.pkgs %}
             {%- set pkg_version = "dpkg -l "+pkg+" | grep "+pkg+" | awk '{print $3}'" %}
-            * {{ pkg }}: {{ salt['cmd.run'](pkg_version) }}
+            * {{ pkg }}: {{ salt['cmd.shell'](pkg_version) }}
             {%- endfor %}
         {%- if controller.backend is defined %}
         backends:
           value: |
-            {%- for backend_name, backend in controller.get('backend', {}).iteritems() %}
+            {%- for backend_name, backend in controller.get('backend', {}).items() %}
             * {{ backend_name }}:
               * storage engine: {{ backend.engine }}
               * volume type: {{ backend.type_name}}
@@ -75,12 +84,12 @@ doc:
           value: |
             {%- for pkg in volume.pkgs %}
             {%- set pkg_version = "dpkg -l "+pkg+" | grep "+pkg+" | awk '{print $3}'" %}
-            * {{ pkg }}: {{ salt['cmd.run'](pkg_version) }}
+            * {{ pkg }}: {{ salt['cmd.shell'](pkg_version) }}
             {%- endfor %}
         {%- if volume.backend is defined %}
         backends:
           value: |
-            {%- for backend_name, backend in volume.get('backend', {}).iteritems() %}
+            {%- for backend_name, backend in volume.get('backend', {}).items() %}
             * {{ backend_name }}:
               * storage engine: {{ backend.engine }}
               * volume type: {{ backend.type_name}}

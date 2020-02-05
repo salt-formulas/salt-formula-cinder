@@ -1,0 +1,289 @@
+{%- from "cinder/map.jinja" import controller with context %}
+
+{%- set connection_x509_ssl_option = '' %}
+{%- if controller.database.get('x509',{}).get('enabled',False) %}
+  {%- set connection_x509_ssl_option = '&ssl_ca=' ~ controller.database.x509.ca_file ~ '&ssl_cert=' ~ controller.database.x509.cert_file ~ '&ssl_key=' ~ controller.database.x509.key_file %}
+{%- elif controller.database.get('ssl',{}).get('enabled',False) %}
+  {%- set connection_x509_ssl_option = '&ssl_ca=' ~ controller.database.ssl.get('cacert_file', controller.cacert_file) %}
+{%- endif %}
+
+[DEFAULT]
+rootwrap_config = /etc/cinder/rootwrap.conf
+api_paste_confg = /etc/cinder/api-paste.ini
+
+iscsi_helper = tgtadm
+volume_name_template = volume-%s
+#volume_group = cinder
+
+verbose = True
+
+osapi_volume_workers = {{ controller.get('volume_workers', '4') }}
+
+auth_strategy = keystone
+
+state_path = /var/lib/cinder
+
+use_syslog=False
+
+glance_num_retries=0
+debug=False
+
+os_region_name={{ controller.identity.region }}
+allow_availability_zone_fallback = {{ controller.get('availability_zone_fallback', True) }}
+
+#glance_api_ssl_compression=False
+#glance_api_insecure=False
+
+osapi_volume_listen={{ controller.osapi.host }}
+
+glance_api_servers = {{ controller.glance.get('protocol','http') }}://{{ controller.glance.host }}:{{ controller.glance.port }}
+{%- if controller.glance.get('protocol','http') == 'https' %}
+glance_ca_certificates_file = {{ controller.glance.get('cacert_file', controller.cacert_file) }}
+{%- endif %}
+
+
+glance_host={{ controller.glance.host }}
+glance_port={{ controller.glance.port }}
+glance_api_version=2
+
+enable_v3_api = True
+
+os_privileged_user_name={{ controller.identity.user }}
+os_privileged_user_password={{ controller.identity.password }}
+os_privileged_user_tenant={{ controller.identity.tenant }}
+os_privileged_user_auth_url={{ controller.identity.get('protocol','http') }}://{{ controller.identity.host }}:5000/v3/
+
+volume_backend_name=DEFAULT
+
+{%- if controller.backend is defined %}
+
+default_volume_type={{ controller.default_volume_type }}
+
+enabled_backends={% for backend_name, backend in controller.get('backend', {}).items() %}{{ backend_name }}{% if not loop.last %},{% endif %}{% endfor %}
+
+{%- endif %}
+
+{%- if controller.storage_availability_zone is defined %}
+storage_availability_zone={{controller.storage_availability_zone}}
+{%- endif %}
+
+{%- if controller.default_availability_zone is defined %}
+default_availability_zone={{controller.default_availability_zone}}
+{%- endif %}
+
+# Enables the Force option on upload_to_image. This enables running
+# upload_volume on in-use volumes for backends that support it. (boolean value)
+#enable_force_upload = false
+enable_force_upload = {{ controller.get('enable_force_upload', False)|lower }}
+
+#RPC response timeout recommended by Hitachi
+rpc_response_timeout=3600
+
+#Rabbit
+control_exchange=cinder
+
+
+volume_clear={{ controller.wipe_method }}
+
+
+
+volume_name_template = volume-%s
+
+#volume_group = vg_cinder_volume
+
+volumes_dir = /var/lib/cinder/volumes
+log_dir=/var/log/cinder
+
+{%- if controller.logging.log_appender %}
+log_config_append=/etc/cinder/logging.conf
+{%- endif %}
+
+# Use syslog for logging. (boolean value)
+#use_syslog=false
+
+use_syslog=false
+verbose=True
+lock_path=/var/lock/cinder
+
+{%- if controller.query_volume_filters is defined %}
+query_volume_filters = {{ controller.query_volume_filters|join(",") }}
+{%- endif %}
+
+nova_catalog_admin_info = compute:nova:adminURL
+nova_catalog_info = compute:nova:{{ controller.identity.get('endpoint_type', 'publicURL') }}
+
+osapi_volume_extension = cinder.api.contrib.standard_extensions
+
+{%- set rabbit_port = controller.message_queue.get('port', 5671 if controller.message_queue.get('ssl',{}).get('enabled', False)  else 5672) %}
+{%- if controller.message_queue.members is defined %}
+transport_url = rabbit://{% for member in controller.message_queue.members -%}
+                             {{ controller.message_queue.user }}:{{ controller.message_queue.password }}@{{ member.host }}:{{ member.get('port',rabbit_port) }}
+                             {%- if not loop.last -%},{%- endif -%}
+                         {%- endfor -%}
+                             /{{ controller.message_queue.virtual_host }}
+{%- else %}
+transport_url = rabbit://{{ controller.message_queue.user }}:{{ controller.message_queue.password }}@{{ controller.message_queue.host }}:{{ rabbit_port }}/{{ controller.message_queue.virtual_host }}
+{%- endif %}
+
+{%- if controller.backup.engine != None %}
+{%- set backup_backend_fragment = "cinder/files/backup_backend/_" + controller.backup.engine + ".conf" %}
+{%- include backup_backend_fragment %}
+{%- endif %}
+{%- if controller.nas_secure_file_permissions is defined %}
+nas_secure_file_permissions={{ controller.nas_secure_file_permissions }}
+{%- endif %}
+{%- if controller.nas_secure_file_operations is defined %}
+nas_secure_file_operations={{ controller.nas_secure_file_operations }}
+{%- endif %}
+{%- if controller.cinder_internal_tenant_user_id is defined %}
+cinder_internal_tenant_user_id={{ controller.cinder_internal_tenant_user_id }}
+{%- endif %}
+{%- if controller.cinder_internal_tenant_project_id is defined %}
+cinder_internal_tenant_project_id={{ controller.cinder_internal_tenant_project_id }}
+{%- endif %}
+
+[oslo_messaging_notifications]
+{%- if controller.notification is mapping %}
+driver = {{ controller.notification.get('driver', 'messagingv2') }}
+{%- if controller.notification.topics is defined %}
+topics = {{ controller.notification.topics }}
+{%- endif %}
+{%- elif controller.notification %}
+driver = messagingv2
+{%- endif %}
+
+[oslo_concurrency]
+
+lock_path=/var/lock/cinder
+
+[oslo_middleware]
+
+enable_proxy_headers_parsing = True
+
+{%- if controller.message_queue.get('ssl',{}).get('enabled', False) %}
+[oslo_messaging_rabbit]
+rabbit_use_ssl=true
+
+  {%- if controller.message_queue.ssl.version is defined %}
+kombu_ssl_version = {{ controller.message_queue.ssl.version }}
+  {%- elif salt['grains.get']('pythonversion') > [2,7,8] %}
+kombu_ssl_version = TLSv1_2
+  {%- endif %}
+
+  {%- if controller.message_queue.get('x509',{}).get('enabled', False) %}
+kombu_ssl_ca_certs = {{ controller.message_queue.x509.ca_file }}
+kombu_ssl_keyfile = {{ controller.message_queue.x509.key_file }}
+kombu_ssl_certfile = {{ controller.message_queue.x509.cert_file }}
+  {%- else %}
+kombu_ssl_ca_certs = {{ controller.message_queue.ssl.get('cacert_file', controller.cacert_file) }}
+  {%- endif %}
+{%- endif %}
+
+
+[keystone_authtoken]
+signing_dir=/tmp/keystone-signing-cinder
+revocation_cache_time = 10
+auth_type = password
+user_domain_name = {{ controller.identity.get('domain', 'Default') }}
+project_domain_name = {{ controller.identity.get('domain', 'Default') }}
+project_name = {{ controller.identity.tenant }}
+username = {{ controller.identity.user }}
+password = {{ controller.identity.password }}
+
+auth_uri={{ controller.identity.get('protocol', 'http') }}://{{ controller.identity.host }}:5000
+auth_url={{ controller.identity.get('protocol', 'http') }}://{{ controller.identity.host }}:35357
+{%- if controller.identity.get('protocol', 'http') == 'https' %}
+cafile={{ controller.identity.get('cacert_file', controller.cacert_file) }}
+{%- endif %}
+
+# Temporary disabled for backward compataiblity
+#auth_uri=http://{{ controller.identity.host }}/identity
+#auth_url=http://{{ controller.identity.host }}/identity_v2_admin
+{%- if controller.get('cache', {}).members is defined %}
+memcached_servers={%- for member in controller.cache.members %}{{ member.host }}:11211{% if not loop.last %},{% endif %}{%- endfor %}
+  {%- if controller.cache.get('security', {}).get('enabled', False) %}
+memcache_security_strategy = {{ controller.cache.security.get('strategy', 'ENCRYPT') }}
+    {%- if controller.cache.security.secret_key is not defined or not controller.cache.security.secret_key %}
+    {%- do salt.test.exception('controller.cache.security.secret_key is not defined: Please add secret_key') %}
+    {%- else %}
+memcache_secret_key = {{ controller.cache.security.secret_key }}
+    {%- endif %}
+  {%- endif %}
+{%- endif %}
+auth_version = v3
+
+{%- if controller.get('barbican', {}).get('enabled', False) %}
+[key_manager]
+api_class = castellan.key_manager.barbican_key_manager.BarbicanKeyManager
+
+[barbican]
+auth_endpoint = {{ controller.identity.get('protocol', 'http') }}://{{ controller.identity.get('host', 'localhost') }}:{{ controller.identity.get('port', '5000') }}/v3
+{%- if controller.barbican.get('protocol', 'http') == 'https' %}
+cafile={{ controller.barbican.get('cacert_file', controller.cacerts_file) }}
+{%- endif %}
+{%- endif %}
+
+[database]
+idle_timeout=3600
+max_pool_size=30
+max_retries=-1
+max_overflow=40
+connection = {{ controller.database.engine }}+pymysql://{{ controller.database.user }}:{{ controller.database.password }}@{{ controller.database.host }}/{{ controller.database.name }}?charset=utf8{{ connection_x509_ssl_option|string }}
+
+{%- if controller.backend is defined %}
+
+{%- for backend_name, backend in controller.get('backend', {}).items() %}
+
+{%- set backend_fragment = "cinder/files/backend/_" + backend.engine + ".conf" %}
+{%- include backend_fragment %}
+
+{%- endfor %}
+
+{%- endif %}
+
+[cors]
+
+#
+# From oslo.middleware.cors
+#
+
+# Indicate whether this resource may be shared with the domain
+# received in the requests "origin" header. (list value)
+#allowed_origin = <None>
+{%- if controller.cors.allowed_origin is defined %}
+allowed_origin = {{ controller.cors.allowed_origin }}
+{%- endif %}
+
+# Indicate that the actual request can include user credentials
+# (boolean value)
+#allow_credentials = true
+{%- if controller.cors.allow_credentials is defined %}
+allow_credentials = {{ controller.cors.allow_credentials }}
+{%- endif %}
+
+# Indicate which headers are safe to expose to the API. Defaults to
+# HTTP Simple Headers. (list value)
+#expose_headers = X-Image-Meta-Checksum,X-Auth-Token,X-Subject-Token,X-Service-Token,X-OpenStack-Request-ID
+{%- if controller.cors.expose_headers is defined %}
+expose_headers = {{ controller.cors.expose_headers }}
+{%- endif %}
+
+# Maximum cache age of CORS preflight requests. (integer value)
+#max_age = 3600
+{%- if controller.cors.max_age is defined %}
+max_age = {{ controller.cors.max_age }}
+{%- endif %}
+
+# Indicate which methods can be used during the actual request. (list
+# value)
+#allow_methods = GET,PUT,POST,DELETE,PATCH
+{%- if controller.cors.allow_methods is defined %}
+allow_methods = {{ controller.cors.allow_methods }}
+{%- endif %}
+
+# Indicate which header field names may be used during the actual
+# request. (list value)
+#allow_headers = Content-MD5,X-Image-Meta-Checksum,X-Storage-Token,Accept-Encoding,X-Auth-Token,X-Identity-Status,X-Roles,X-Service-Catalog,X-User-Id,X-Tenant-Id,X-OpenStack-Request-ID
+{%- if controller.cors.allow_headers is defined %}
+allow_headers = {{ controller.cors.allow_headers }}
+{%- endif %}

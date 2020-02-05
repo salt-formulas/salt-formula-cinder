@@ -1,4 +1,4 @@
-{%- from "cinder/map.jinja" import volume, system_cacerts_file with context %}
+{%- from "cinder/map.jinja" import volume with context %}
 
 [DEFAULT]
 rootwrap_config = /etc/cinder/rootwrap.conf
@@ -38,7 +38,7 @@ volume_backend_name=DEFAULT
 
 default_volume_type={{ volume.default_volume_type }}
 
-enabled_backends={% for backend_name, backend in volume.get('backend', {}).iteritems() %}{{ backend_name }}{% if not loop.last %},{% endif %}{% endfor %}
+enabled_backends={% for backend_name, backend in volume.get('backend', {}).items() %}{{ backend_name }}{% if not loop.last %},{% endif %}{% endfor %}
 
 {%- endif %}
 
@@ -50,6 +50,10 @@ storage_availability_zone={{volume.storage_availability_zone}}
 default_availability_zone={{volume.default_availability_zone}}
 {%- endif %}
 
+# Enables the Force option on upload_to_image. This enables running
+# upload_volume on in-use volumes for backends that support it. (boolean value)
+#enable_force_upload = false
+enable_force_upload = {{ volume.get('enable_force_upload', False)|lower }}
 
 #RPC response timeout recommended by Hitachi
 rpc_response_timeout=3600
@@ -127,11 +131,7 @@ kombu_ssl_version = {{ volume.message_queue.ssl.version }}
 kombu_ssl_version = TLSv1_2
 {%- endif %}
 
-{%- if volume.message_queue.ssl.cacert_file is defined %}
-kombu_ssl_ca_certs = {{ volume.message_queue.ssl.cacert_file }}
-{%- else %}
-kombu_ssl_ca_certs={{ system_cacerts_file }}
-{%- endif %}
+kombu_ssl_ca_certs = {{ volume.message_queue.ssl.get('cacert_file', volume.cacert_file) }}
 {%- endif %}
 
 rabbit_userid = {{ volume.message_queue.user }}
@@ -150,7 +150,7 @@ username = {{ volume.identity.user }}
 password = {{ volume.identity.password }}
 auth_uri=http://{{ volume.identity.host }}:5000/v3
 auth_url=http://{{ volume.identity.host }}:35357/v3
-{%- if volume.cache is defined %}
+{%- if volume.get('cache', {}).members is defined %}
 memcached_servers={%- for member in volume.cache.members %}{{ member.host }}:11211{% if not loop.last %},{% endif %}{%- endfor %}
 {%- endif %}
 
@@ -159,11 +159,11 @@ idle_timeout=3600
 max_pool_size=30
 max_retries=-1
 max_overflow=40
-connection = {{ volume.database.engine }}+pymysql://{{ volume.database.user }}:{{ volume.database.password }}@{{ volume.database.host }}/{{ volume.database.name }}
+connection = {{ volume.database.engine }}+pymysql://{{ volume.database.user }}:{{ volume.database.password }}@{{ volume.database.host }}/{{ volume.database.name }}?charset=utf8{%- if volume.database.get('ssl',{}).get('enabled',False) %}&ssl_ca={{ volume.database.ssl.get('cacert_file', volume.cacert_file) }}{% endif %}
 
 {%- if volume.backend is defined %}
 
-{%- for backend_name, backend in volume.get('backend', {}).iteritems() %}
+{%- for backend_name, backend in volume.get('backend', {}).items() %}
 
 {%- set backend_fragment = "cinder/files/backend/_" + backend.engine + ".conf" %}
 {%- include backend_fragment %}

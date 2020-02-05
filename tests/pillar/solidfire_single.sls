@@ -11,6 +11,7 @@ cinder:
         san_password: password
         clustername: cluster1
         sf_emulate_512: false
+        sf_api_port: 15443
     identity:
       engine: keystone
       host: 127.0.0.1
@@ -24,6 +25,15 @@ cinder:
     glance:
         host: 127.0.0.1
         port: 9292
+    logging:
+      log_appender: false
+      log_handlers:
+        watchedfile:
+          enabled: true
+        fluentd:
+          enabled: false
+        ossyslog:
+          enabled: false
     default_volume_type: 7k2SaS
     message_queue:
       engine: rabbitmq
@@ -65,6 +75,15 @@ cinder:
     glance:
         host: 127.0.0.1
         port: 9292
+    logging:
+      log_appender: false
+      log_handlers:
+        watchedfile:
+          enabled: true
+        fluentd:
+          enabled: false
+        ossyslog:
+          enabled: false
     default_volume_type: 7k2SaS
     message_queue:
       engine: rabbitmq
@@ -80,3 +99,45 @@ cinder:
       name: cinder
       user: cinder
       password: pwd
+apache:
+  server:
+    enabled: true
+    default_mpm: event
+    mpm:
+      prefork:
+        enabled: true
+        servers:
+          start: 5
+          spare:
+            min: 2
+            max: 10
+        max_requests: 0
+        max_clients: 20
+        limit: 20
+    site:
+      cinder:
+        enabled: false
+        available: true
+        type: wsgi
+        name: cinder
+        wsgi:
+          daemon_process: cinder-wsgi
+          processes: 5
+          threads: 1
+          user: cinder
+          group: cinder
+          display_name: '%{GROUP}'
+          script_alias: '/ /usr/bin/cinder-wsgi'
+          application_group: '%{GLOBAL}'
+          authorization: 'On'
+        host:
+          address: 127.0.0.1
+          name: 127.0.0.1
+          port: 8776
+        log:
+          custom:
+            format: >-
+              %v:%p %{X-Forwarded-For}i %h %l %u %t \"%r\" %>s %D %O \"%{Referer}i\" \"%{User-Agent}i\"
+          error:
+            enabled: true
+            format: '%M'

@@ -5,6 +5,9 @@ classes:
 parameters:
   _param:
     keystone_cinder_endpoint_type: internalURL
+    openstack_log_appender: false
+    openstack_fluentd_handler_enabled: false
+    openstack_ossyslog_handler_enabled: false
   cinder:
     controller:
       enabled: true
@@ -30,6 +33,15 @@ parameters:
       glance:
         host: ${_param:cluster_vip_address}
         port: 9292
+      logging:
+        log_appender: ${_param:openstack_log_appender}
+        log_handlers:
+          watchedfile:
+            enabled: true
+          fluentd:
+            enabled: ${_param:openstack_fluentd_handler_enabled}
+          ossyslog:
+            enabled: ${_param:openstack_ossyslog_handler_enabled}
       message_queue:
         engine: rabbitmq
         host: ${_param:cluster_vip_address}

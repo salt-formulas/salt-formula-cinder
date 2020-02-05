@@ -1,5 +1,10 @@
 cinder:
   controller:
+    osapi:
+      host: 127.0.0.1
+    glance:
+      host: 127.0.0.1
+      port: 9292
     enabled: true
     version: mitaka
     message_queue:
@@ -9,6 +14,30 @@ cinder:
       user: openstack
       password: pwd
       virtual_host: '/openstack'
+    identity:
+      engine: keystone
+      host: 127.0.0.1
+      port: 35357
+      tenant: service
+      user: cinder
+      password: pwd
+      region: regionOne
+    logging:
+      log_appender: false
+      log_handlers:
+        watchedfile:
+          enabled: true
+        fluentd:
+          enabled: false
+        ossyslog:
+          enabled: false
+    database:
+      engine: mysql
+      host: 127.0.0.1
+      port: 3306
+      name: cinder
+      user: cinder
+      password: pwd
     backend:
       netapp:
         engine: netapp
@@ -31,6 +60,13 @@ cinder:
   volume:
     enabled: true
     version: mitaka
+    database:
+      engine: mysql
+      host: 127.0.0.1
+      port: 3306
+      name: cinder
+      user: cinder
+      password: pwd
     message_queue:
       engine: rabbitmq
       host: 127.0.0.1

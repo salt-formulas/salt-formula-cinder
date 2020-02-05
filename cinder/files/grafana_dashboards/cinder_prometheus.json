@@ -72,7 +72,7 @@
           "tableColumn": "",
           "targets": [
             {
-              "expr": "min(openstack_api_check_status{service=~\"cinder.*\"})",
+              "expr": "max(openstack_api_check_status{service=~\"cinder.*\"})",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{ service }}",
@@ -436,7 +436,7 @@
     },
     {
       "collapse": false,
-      "height": "250px",
+      "height": 220,
       "panels": [
         {
           "content": "<br />\n<br />\n<br />\n<br />\n\n\n\n\n<h1 align=\"center\">Schedulers</h1>",
@@ -503,7 +503,7 @@
           "tableColumn": "",
           "targets": [
             {
-              "expr": "max(openstack_cinder_services{state=\"disabled\", service=\"cinder-scheduler\"})",
+              "expr": "count(openstack_cinder_service_status{service=~\"cinder-scheduler\"} == 1 and openstack_cinder_service_state{service=~\"cinder-scheduler\"} == 1) or absent(openstack_cinder_service_status{service=~\"cinder-scheduler\"} == 1 and openstack_cinder_service_state{service=~\"cinder-scheduler\"} == 1) - 1",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "",
@@ -512,7 +512,7 @@
             }
           ],
           "thresholds": "1,1",
-          "title": "Disabled",
+          "title": "En/Up",
           "type": "singlestat",
           "valueFontSize": "80%",
           "valueMaps": [
@@ -580,7 +580,7 @@
           "tableColumn": "",
           "targets": [
             {
-              "expr": "max(openstack_cinder_services{state=\"up\", service=\"cinder-scheduler\"})",
+              "expr": "count(openstack_cinder_service_status{service=~\"cinder-scheduler\"} == 1 and openstack_cinder_service_state{service=~\"cinder-scheduler\"} == 0) or absent(openstack_cinder_service_status{service=~\"cinder-scheduler\"} == 1 and openstack_cinder_service_state{service=~\"cinder-scheduler\"} == 0) - 1",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "",
@@ -589,7 +589,84 @@
             }
           ],
           "thresholds": "1,1",
-          "title": "Up",
+          "title": "En/Down",
+          "type": "singlestat",
+          "valueFontSize": "80%",
+          "valueMaps": [
+            {
+              "op": "=",
+              "text": "N/A",
+              "value": "null"
+            }
+          ],
+          "valueName": "current"
+        },
+        {
+          "cacheTimeout": null,
+          "colorBackground": false,
+          "colorValue": false,
+          "colors": [
+            "rgba(50, 172, 45, 0.97)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(245, 54, 54, 0.9)"
+          ],
+          "datasource": "prometheus",
+          "format": "none",
+          "gauge": {
+            "maxValue": 100,
+            "minValue": 0,
+            "show": false,
+            "thresholdLabels": false,
+            "thresholdMarkers": true
+          },
+          "id": 47,
+          "interval": null,
+          "links": [],
+          "mappingType": 1,
+          "mappingTypes": [
+            {
+              "name": "value to text",
+              "value": 1
+            },
+            {
+              "name": "range to text",
+              "value": 2
+            }
+          ],
+          "maxDataPoints": 100,
+          "nullPointMode": "connected",
+          "nullText": null,
+          "postfix": "",
+          "postfixFontSize": "50%",
+          "prefix": "",
+          "prefixFontSize": "50%",
+          "rangeMaps": [
+            {
+              "from": "null",
+              "text": "N/A",
+              "to": "null"
+            }
+          ],
+          "span": 1,
+          "sparkline": {
+            "fillColor": "rgba(31, 118, 189, 0.18)",
+            "full": false,
+            "lineColor": "rgb(31, 120, 193)",
+            "show": false
+          },
+          "tableColumn": "",
+          "targets": [
+            {
+              "expr": "count(openstack_cinder_service_status{service=~\"cinder-scheduler\"} == 0 and openstack_cinder_service_state{service=~\"cinder-scheduler\"} == 1) or absent(openstack_cinder_service_status{service=~\"cinder-scheduler\"} == 0 and openstack_cinder_service_state{service=~\"cinder-scheduler\"} == 1) - 1",
+              "format": "time_series",
+              "intervalFactor": 2,
+              "legendFormat": "",
+              "refId": "A",
+              "step": 60
+            }
+          ],
+          "thresholds": "1,1",
+          "title": "Dis/Up",
           "type": "singlestat",
           "valueFontSize": "80%",
           "valueMaps": [
@@ -657,7 +734,7 @@
           "tableColumn": "",
           "targets": [
             {
-              "expr": "max(openstack_cinder_services{state=\"down\", service=\"cinder-scheduler\"})",
+              "expr": "count(openstack_cinder_service_status{service=~\"cinder-scheduler\"} == 0 and openstack_cinder_service_state{service=~\"cinder-scheduler\"} == 0) or absent(openstack_cinder_service_status{service=~\"cinder-scheduler\"} == 0 and openstack_cinder_service_state{service=~\"cinder-scheduler\"} == 0) - 1",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "",
@@ -666,7 +743,7 @@
             }
           ],
           "thresholds": "1,1",
-          "title": "Down",
+          "title": "Dis/Down",
           "type": "singlestat",
           "valueFontSize": "80%",
           "valueMaps": [
@@ -706,18 +783,42 @@
           "renderer": "flot",
           "seriesOverrides": [],
           "spaceLength": 10,
-          "span": 7,
+          "span": 6,
           "stack": false,
           "steppedLine": false,
           "targets": [
             {
-              "expr": "max(openstack_cinder_services{service=\"cinder-scheduler\"}) by (state)",
+              "expr": "count(openstack_cinder_service_status{service=~\"cinder-scheduler\"} == 1 and openstack_cinder_service_state{service=~\"cinder-scheduler\"} == 1) or absent(openstack_cinder_service_status{service=~\"cinder-scheduler\"} == 1 and openstack_cinder_service_state{service=~\"cinder-scheduler\"} == 1) - 1",
               "format": "time_series",
               "intervalFactor": 2,
-              "legendFormat": "{{ state }}",
+              "legendFormat": "en/up",
               "metric": "openstack_cinder_services",
               "refId": "A",
-              "step": 4
+              "step": 10
+            },
+            {
+              "expr": "count(openstack_cinder_service_status{service=~\"cinder-scheduler\"} == 1 and openstack_cinder_service_state{service=~\"cinder-scheduler\"} == 0) or absent(openstack_cinder_service_status{service=~\"cinder-scheduler\"} == 1 and openstack_cinder_service_state{service=~\"cinder-scheduler\"} == 0) - 1",
+              "format": "time_series",
+              "intervalFactor": 2,
+              "legendFormat": "en/down",
+              "refId": "B",
+              "step": 10
+            },
+            {
+              "expr": "count(openstack_cinder_service_status{service=~\"cinder-scheduler\"} == 0 and openstack_cinder_service_state{service=~\"cinder-scheduler\"} == 1) or absent(openstack_cinder_service_status{service=~\"cinder-scheduler\"} == 0 and openstack_cinder_service_state{service=~\"cinder-scheduler\"} == 1) - 1",
+              "format": "time_series",
+              "intervalFactor": 2,
+              "legendFormat": "dis/up",
+              "refId": "C",
+              "step": 10
+            },
+            {
+              "expr": "count(openstack_cinder_service_status{service=~\"cinder-scheduler\"} == 0 and openstack_cinder_service_state{service=~\"cinder-scheduler\"} == 0) or absent(openstack_cinder_service_status{service=~\"cinder-scheduler\"} == 0 and openstack_cinder_service_state{service=~\"cinder-scheduler\"} == 0) - 1",
+              "format": "time_series",
+              "intervalFactor": 2,
+              "legendFormat": "dis/down",
+              "refId": "D",
+              "step": 10
             }
           ],
           "thresholds": [],
@@ -743,7 +844,7 @@
               "label": null,
               "logBase": 1,
               "max": null,
-              "min": null,
+              "min": "0",
               "show": true
             },
             {
@@ -821,7 +922,7 @@
           "tableColumn": "",
           "targets": [
             {
-              "expr": "max(openstack_cinder_services{state=\"disabled\", service=\"cinder-volume\"})",
+              "expr": "count(openstack_cinder_service_status{service=~\"cinder-volume\"} == 1 and openstack_cinder_service_state{service=~\"cinder-volume\"} == 1) or absent(openstack_cinder_service_status{service=~\"cinder-volume\"} == 1 and openstack_cinder_service_state{service=~\"cinder-volume\"} == 1) - 1",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "",
@@ -830,7 +931,7 @@
             }
           ],
           "thresholds": "1,1",
-          "title": "Disabled",
+          "title": "En/Up",
           "type": "singlestat",
           "valueFontSize": "80%",
           "valueMaps": [
@@ -898,7 +999,7 @@
           "tableColumn": "",
           "targets": [
             {
-              "expr": "max(openstack_cinder_services{state=\"up\", service=\"cinder-volume\"})",
+              "expr": "count(openstack_cinder_service_status{service=~\"cinder-volume\"} == 1 and openstack_cinder_service_state{service=~\"cinder-volume\"} == 0) or absent(openstack_cinder_service_status{service=~\"cinder-volume\"} == 1 and openstack_cinder_service_state{service=~\"cinder-volume\"} == 0) - 1",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "",
@@ -907,7 +1008,84 @@
             }
           ],
           "thresholds": "1,1",
-          "title": "Up",
+          "title": "En/Down",
+          "type": "singlestat",
+          "valueFontSize": "80%",
+          "valueMaps": [
+            {
+              "op": "=",
+              "text": "N/A",
+              "value": "null"
+            }
+          ],
+          "valueName": "current"
+        },
+        {
+          "cacheTimeout": null,
+          "colorBackground": false,
+          "colorValue": false,
+          "colors": [
+            "rgba(50, 172, 45, 0.97)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(245, 54, 54, 0.9)"
+          ],
+          "datasource": "prometheus",
+          "format": "none",
+          "gauge": {
+            "maxValue": 100,
+            "minValue": 0,
+            "show": false,
+            "thresholdLabels": false,
+            "thresholdMarkers": true
+          },
+          "id": 48,
+          "interval": null,
+          "links": [],
+          "mappingType": 1,
+          "mappingTypes": [
+            {
+              "name": "value to text",
+              "value": 1
+            },
+            {
+              "name": "range to text",
+              "value": 2
+            }
+          ],
+          "maxDataPoints": 100,
+          "nullPointMode": "connected",
+          "nullText": null,
+          "postfix": "",
+          "postfixFontSize": "50%",
+          "prefix": "",
+          "prefixFontSize": "50%",
+          "rangeMaps": [
+            {
+              "from": "null",
+              "text": "N/A",
+              "to": "null"
+            }
+          ],
+          "span": 1,
+          "sparkline": {
+            "fillColor": "rgba(31, 118, 189, 0.18)",
+            "full": false,
+            "lineColor": "rgb(31, 120, 193)",
+            "show": false
+          },
+          "tableColumn": "",
+          "targets": [
+            {
+              "expr": "count(openstack_cinder_service_status{service=~\"cinder-volume\"} == 0 and openstack_cinder_service_state{service=~\"cinder-volume\"} == 1) or absent(openstack_cinder_service_status{service=~\"cinder-volume\"} == 0 and openstack_cinder_service_state{service=~\"cinder-volume\"} == 1) - 1",
+              "format": "time_series",
+              "intervalFactor": 2,
+              "legendFormat": "",
+              "refId": "A",
+              "step": 60
+            }
+          ],
+          "thresholds": "1,1",
+          "title": "Dis/Up",
           "type": "singlestat",
           "valueFontSize": "80%",
           "valueMaps": [
@@ -975,7 +1153,7 @@
           "tableColumn": "",
           "targets": [
             {
-              "expr": "max(openstack_cinder_services{state=\"down\", service=\"cinder-volume\"})",
+              "expr": "count(openstack_cinder_service_status{service=~\"cinder-volume\"} == 0 and openstack_cinder_service_state{service=~\"cinder-volume\"} == 0) or absent(openstack_cinder_service_status{service=~\"cinder-volume\"} == 0 and openstack_cinder_service_state{service=~\"cinder-volume\"} == 0) - 1",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "",
@@ -984,7 +1162,7 @@
             }
           ],
           "thresholds": "1,1",
-          "title": "Down",
+          "title": "Dis/Down",
           "type": "singlestat",
           "valueFontSize": "80%",
           "valueMaps": [
@@ -1024,24 +1202,48 @@
           "renderer": "flot",
           "seriesOverrides": [],
           "spaceLength": 10,
-          "span": 7,
+          "span": 6,
           "stack": false,
           "steppedLine": false,
           "targets": [
             {
-              "expr": "max(openstack_cinder_services{service=\"cinder-volume\"}) by (state)",
+              "expr": "count(openstack_cinder_service_status{service=~\"cinder-volume\"} == 1 and openstack_cinder_service_state{service=~\"cinder-volume\"} == 1) or absent(openstack_cinder_service_status{service=~\"cinder-volume\"} == 1 and openstack_cinder_service_state{service=~\"cinder-volume\"} == 1) - 1",
               "format": "time_series",
               "intervalFactor": 2,
-              "legendFormat": "{{ state }}",
+              "legendFormat": "en/up",
               "metric": "openstack_cinder_services",
               "refId": "A",
-              "step": 4
+              "step": 10
+            },
+            {
+              "expr": "count(openstack_cinder_service_status{service=~\"cinder-volume\"} == 1 and openstack_cinder_service_state{service=~\"cinder-volume\"} == 0) or absent(openstack_cinder_service_status{service=~\"cinder-volume\"} == 1 and openstack_cinder_service_state{service=~\"cinder-volume\"} == 0) - 1",
+              "format": "time_series",
+              "intervalFactor": 2,
+              "legendFormat": "en/down",
+              "refId": "B",
+              "step": 10
+            },
+            {
+              "expr": "count(openstack_cinder_service_status{service=~\"cinder-volume\"} == 0 and openstack_cinder_service_state{service=~\"cinder-volume\"} == 1) or absent(openstack_cinder_service_status{service=~\"cinder-volume\"} == 0 and openstack_cinder_service_state{service=~\"cinder-volume\"} == 1) - 1",
+              "format": "time_series",
+              "intervalFactor": 2,
+              "legendFormat": "dis/up",
+              "refId": "C",
+              "step": 10
+            },
+            {
+              "expr": "count(openstack_cinder_service_status{service=~\"cinder-volume\"} == 0 and openstack_cinder_service_state{service=~\"cinder-volume\"} == 0) or absent(openstack_cinder_service_status{service=~\"cinder-volume\"} == 0 and openstack_cinder_service_state{service=~\"cinder-volume\"} == 0) - 1",
+              "format": "time_series",
+              "intervalFactor": 2,
+              "legendFormat": "dis/down",
+              "refId": "D",
+              "step": 10
             }
           ],
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "History",
+          "title": "",
           "tooltip": {
             "shared": true,
             "sort": 0,
@@ -1061,7 +1263,7 @@
               "label": null,
               "logBase": 1,
               "max": null,
-              "min": null,
+              "min": "0",
               "show": true
             },
             {
@@ -1356,7 +1558,7 @@
               "legendFormat": "{{ status }}",
               "metric": "openstack_cinder_volumes",
               "refId": "A",
-              "step": 4
+              "step": 10
             }
           ],
           "thresholds": [],
@@ -1371,6 +1573,7 @@
           },
           "type": "graph",
           "xaxis": {
+            "buckets": null,
             "mode": "time",
             "name": null,
             "show": true,
@@ -1663,7 +1866,7 @@
               "legendFormat": "{{ status }}",
               "metric": "openstack_cinder_volumes_size",
               "refId": "A",
-              "step": 4
+              "step": 10
             }
           ],
           "thresholds": [],
@@ -1678,6 +1881,7 @@
           },
           "type": "graph",
           "xaxis": {
+            "buckets": null,
             "mode": "time",
             "name": null,
             "show": true,
@@ -1970,7 +2174,7 @@
               "legendFormat": "{{ status }}",
               "metric": "openstack_cinder_snapshots",
               "refId": "A",
-              "step": 4
+              "step": 10
             }
           ],
           "thresholds": [],
@@ -1985,6 +2189,7 @@
           },
           "type": "graph",
           "xaxis": {
+            "buckets": null,
             "mode": "time",
             "name": null,
             "show": true,
@@ -2277,7 +2482,7 @@
               "legendFormat": "{{ status }}",
               "metric": "openstack_cinder_snapshots_size",
               "refId": "A",
-              "step": 4
+              "step": 10
             }
           ],
           "thresholds": [],
@@ -2292,6 +2497,7 @@
           },
           "type": "graph",
           "xaxis": {
+            "buckets": null,
             "mode": "time",
             "name": null,
             "show": true,
@@ -2324,16 +2530,18 @@
     }
   ],
   "schemaVersion": 14,
-  "sharedCrosshair": true,
   "style": "dark",
   "tags": [
-    "cinder"
+    "openstack"
   ],
   "templating": {
     "list": [
       {
         "allValue": null,
-        "current": {},
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
         "datasource": "prometheus",
         "hide": 0,
         "includeAll": true,
@@ -2385,6 +2593,6 @@
   },
   "timezone": "browser",
   "title": "Cinder",
-  "version": 4
+  "version": 5
 }
 {% endraw %}

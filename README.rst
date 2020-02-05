@@ -1,18 +1,21 @@
-==============================
-Openstack Cinder Block Storage
-==============================
+=====
+Usage
+=====
 
-Cinder provides an infrastructure for managing volumes in OpenStack. It was
-originally a Nova component called nova-volume, but has become an independent
-project since the Folsom release.
+Cinder provides an infrastructure for managing volumes in OpenStack.
+Originally, this project was the Nova component called ``nova-volume``
+and starting from the Folsom OpenStack release it has become an independent
+project.
 
-Sample pillars
-==============
+This file provides the sample configurations for different use cases:
 
-New structure divides cinder-api,cinder-scheduler to role controller and
-cinder-volume to role volume.
+* Pillar sample of a basic Cinder configuration:
 
-.. code-block:: yaml
+  The pillar structure defines ``cinder-api`` and ``cinder-scheduler`` inside
+  the ``controller`` role and ``cinder-volume`` inside the to ``volume``
+  role.
+
+  .. code-block:: yaml
 
     cinder:
       controller:
@@ -25,6 +28,7 @@ cinder-volume to role volume.
         cinder_internal_tenant_user_id: f46924c112a14c80ab0a24a613d95eef
         cinder_internal_tenant_project_id: b7455b8974bb4064ad247c8f375eae6c
         default_volume_type: 7k2SaS
+        enable_force_upload: true
         availability_zone_fallback: True
         database:
           engine: mysql
@@ -62,6 +66,8 @@ cinder-volume to role volume.
         audit:
           enabled: false
         osapi_max_limit: 500
+        barbican:
+          enabled: true
 
     cinder:
       volume:
@@ -74,6 +80,8 @@ cinder-volume to role volume.
         cinder_internal_tenant_user_id: f46924c112a14c80ab0a24a613d95eef
         cinder_internal_tenant_project_id: b7455b8974bb4064ad247c8f375eae6c
         default_volume_type: 7k2SaS
+        enable_force_upload: true
+        my_ip: 192.168.0.254
         database:
           engine: mysql
           host: 127.0.0.1
@@ -109,11 +117,26 @@ cinder-volume to role volume.
             pool: SAS7K2
         audit:
           enabled: false
+        barbican:
+          enabled: true
 
 
-Enable CORS parameters
+Volume vmware related options:
 
 .. code-block:: yaml
+
+    cinder:
+      volume:
+        backend:
+          vmware:
+            engine: vmware
+            host_username: vmware
+            host_password: vmware
+            cluster_names: vmware_cluster01,vmware_cluster02
+
+* The CORS parameters enablement:
+
+  .. code-block:: yaml
 
     cinder:
       controller:
@@ -125,101 +148,91 @@ Enable CORS parameters
           allow_credentials: True
           max_age: 86400
 
-Client-side RabbitMQ HA setup for controller
+* The client-side RabbitMQ HA setup for the controller:
 
-.. code-block:: yaml
+  .. code-block:: yaml
 
-    cinder:
-      controller:
-        ....
-        message_queue:
-          engine: rabbitmq
-          members:
-            - host: 10.0.16.1
-            - host: 10.0.16.2
-            - host: 10.0.16.3
-          user: openstack
-          password: pwd
-          virtual_host: '/openstack'
-        ....
+      cinder:
+        controller:
+          ....
+          message_queue:
+            engine: rabbitmq
+            members:
+              - host: 10.0.16.1
+              - host: 10.0.16.2
+              - host: 10.0.16.3
+            user: openstack
+            password: pwd
+            virtual_host: '/openstack'
+          ....
 
-Client-side RabbitMQ HA setup for volume component
+* The client-side RabbitMQ HA setup for the volume component
 
-.. code-block:: yaml
+  .. code-block:: yaml
 
-    cinder:
-      volume:
-        ....
-        message_queue:
-          engine: rabbitmq
-          members:
-            - host: 10.0.16.1
-            - host: 10.0.16.2
-            - host: 10.0.16.3
-          user: openstack
-          password: pwd
-          virtual_host: '/openstack'
-        ....
-
-
-**Client-side RabbitMQ TLS configuration.**
-
-|
-
-To enable TLS for oslo.messaging you need to provide the CA certificate.
-By default system-wide CA certs are used. Nothing should be specified except `ssl.enabled`.
-
-.. code-block:: yaml
-
-  cinder:
-    controller or volume:
-      ....
-      message_queue:
-        ssl:
-          enabled: True
+     cinder:
+       volume:
+         ....
+         message_queue:
+           engine: rabbitmq
+           members:
+             - host: 10.0.16.1
+             - host: 10.0.16.2
+             - host: 10.0.16.3
+           user: openstack
+           password: pwd
+           virtual_host: '/openstack'
+         ....
 
 
+* Configuring TLS communications.
 
-Use `cacert_file` option to specify the CA-cert file path explicitly:
+  .. note:: By default, system-wide installed CA certs are used.
+            Therefore, the ``cacert_file`` and ``cacert`` parameters are
+            optional.
 
-.. code-block:: yaml
+  * RabbitMQ TLS:
 
-  cinder:
-    controller or volume:
-      ....
-      message_queue:
-        ssl:
-          enabled: True
-          cacert_file: /etc/ssl/rabbitmq-ca.pem
+    .. code-block:: yaml
 
-To manage content of the `cacert_file` use the `cacert` option:
+       cinder:
+         controller, volume:
+            message_queue:
+              port: 5671
+              ssl:
+                enabled: True
+                (optional) cacert: cert body if the cacert_file does not exists
+                (optional) cacert_file: /etc/openstack/rabbitmq-ca.pem
+                (optional) version: TLSv1_2
 
-.. code-block:: yaml
+  * MySQL TLS:
 
-  cinder:
-    controller or volume:
-      ....
-      message_queue:
-        ssl:
-          enabled: True
-          cacert: |
+    .. code-block:: yaml
 
-          -----BEGIN CERTIFICATE-----
-                    ...
-          -----END CERTIFICATE-------
+       cinder:
+         controller:
+            database:
+              ssl:
+                enabled: True
+                (optional) cacert: cert body if the cacert_file does not exists
+                (optional) cacert_file: /etc/openstack/mysql-ca.pem
 
-          cacert_file: /etc/openstack/rabbitmq-ca.pem
+  * Openstack HTTPS API:
 
+    .. code-block:: yaml
 
-Notice:
- * The `message_queue.port` is set to **5671** (AMQPS) by default if `ssl.enabled=True`.
- * Use `message_queue.ssl.version` if you need to specify protocol version. By default is TLSv1 for python < 2.7.9 and TLSv1_2 for version above.
+       cinder:
+        controller, volume:
+            identity:
+               protocol: https
+               (optional) cacert_file: /etc/openstack/proxy.pem
+            glance:
+               protocol: https
+               (optional) cacert_file: /etc/openstack/proxy.pem
 
+* Cinder setup with zeroing deleted volumes:
 
-
-Cinder setup with zeroing deleted volumes
-
-.. code-block:: yaml
+  .. code-block:: yaml
 
     cinder:
       controller:
@@ -227,9 +240,9 @@ Cinder setup with zeroing deleted volumes
         wipe_method: zero
         ...
 
-Cinder setup with shreding deleted volumes
+* Cinder setup with shreding deleted volumes:
 
-.. code-block:: yaml
+  .. code-block:: yaml
 
     cinder:
       controller:
@@ -237,9 +250,9 @@ Cinder setup with shreding deleted volumes
         wipe_method: shred
         ...
 
-Configuration of policy.json file
+* Configuration of ``policy.json`` file:
 
-.. code-block:: yaml
+  .. code-block:: yaml
 
     cinder:
       controller:
@@ -249,10 +262,20 @@ Configuration of policy.json file
           # Add key without value to remove line from policy.json
           'volume:extend':
 
+* Default Cinder backend ``lvm_type`` setup:
 
-Default Cinder setup with iSCSI target
+  .. code-block:: yaml
 
-.. code-block:: yaml
+    cinder:
+      volume:
+        enabled: true
+        backend:
+          # Type of LVM volumes to deploy; (default, thin, or auto). Auto defaults to thin if thin is supported.
+          lvm_type: auto
+
+* Default Cinder setup with iSCSI target:
+
+  .. code-block:: yaml
 
     cinder:
       controller:
@@ -286,9 +309,9 @@ Default Cinder setup with iSCSI target
             type_name: lvmdriver-1
             volume_group: cinder-volume
 
-Cinder setup for IBM Storwize
+* Cinder setup for IBM Storwize:
 
-.. code-block:: yaml
+  .. code-block:: yaml
 
     cinder:
       volume:
@@ -328,10 +351,9 @@ Cinder setup for IBM Storwize
             multipath: true
             pool: SAS15K
 
+* Cinder setup with NFS:
 
-Cinder setup with NFS
-
-.. code-block:: yaml
+  .. code-block:: yaml
 
     cinder:
       controller:
@@ -347,10 +369,9 @@ Cinder setup with NFS
             - 172.16.10.110:/var/nfs/cinder
             options: rw,sync
 
+* Cinder setup with NetApp:
 
-Cinder setup with NetApp
-
-.. code-block:: yaml
+  .. code-block:: yaml
 
     cinder:
       controller:
@@ -379,10 +400,9 @@ Cinder setup with NetApp
           nfs-common:
             version: latest
 
+* Cinder setup with Hitachi VPS:
 
-Cinder setup with Hitachi VPS
-
-.. code-block:: yaml
+  .. code-block:: yaml
 
     cinder:
       controller:
@@ -394,9 +414,9 @@ Cinder setup with Hitachi VPS
             engine: hitachi_vsp
             connection: FC
 
-Cinder setup with Hitachi VPS with defined ldev range
+* Cinder setup with Hitachi VPS with defined ``ldev`` range:
 
-.. code-block:: yaml
+  .. code-block:: yaml
 
     cinder:
       controller:
@@ -409,30 +429,31 @@ Cinder setup with Hitachi VPS with defined ldev range
             connection: FC
             ldev_range: 0-1000
 
-Cinder setup with CEPH
+* Cinder setup with Ceph:
 
-.. code-block:: yaml
+  .. code-block:: yaml
 
-    cinder:
-      controller:
-        enabled: true
-        backend:
-          ceph_backend:
-            type_name: standard-iops
-            backend: ceph_backend
-            pool: volumes
-            engine: ceph
-            user: cinder
-            secret_uuid: da74ccb7-aa59-1721-a172-0006b1aa4e3e
-            client_cinder_key: AQDOavlU6BsSJhAAnpFR906mvdgdfRqLHwu0Uw==
-            report_discard_supported: True
+      cinder:
+        controller:
+          enabled: true
+          backend:
+            ceph_backend:
+              type_name: standard-iops
+              backend: ceph_backend
+              backend_host: ceph
+              pool: volumes
+              engine: ceph
+              user: cinder
+              secret_uuid: da74ccb7-aa59-1721-a172-0006b1aa4e3e
+              client_cinder_key: AQDOavlU6BsSJhAAnpFR906mvdgdfRqLHwu0Uw==
+              report_discard_supported: True
+              image_volume_cache_enabled: False
 
-http://ceph.com/docs/master/rbd/rbd-openstack/
+  .. note:: `Ceph official documentation <http://ceph.com/docs/master/rbd/rbd-openstack/>`__
 
+* Cinder setup with HP3par:
 
-Cinder setup with HP3par
-
-.. code-block:: yaml
+  .. code-block:: yaml
 
     cinder:
       controller:
@@ -451,9 +472,9 @@ Cinder setup with HP3par
             debug: True
             snapcpg: OpenStackSNAPCPG
 
-Cinder setup with Fujitsu Eternus
+* Cinder setup with Fujitsu Eternus:
 
-.. code-block:: yaml
+  .. code-block:: yaml
 
     cinder:
       volume:
@@ -480,9 +501,9 @@ Cinder setup with Fujitsu Eternus
             connection: FC/iSCSI
             name: 10k_SAS
 
-Cinder setup with IBM GPFS filesystem
+* Cinder setup with IBM GPFS filesystem:
 
-.. code-block:: yaml
+  .. code-block:: yaml
 
     cinder:
       volume:
@@ -497,9 +518,9 @@ Cinder setup with IBM GPFS filesystem
             engine: gpfs
             mount_point: '/mnt/gpfs-openstack/cinder/silver'
 
-Cinder setup with HP LeftHand
+* Cinder setup with HP LeftHand:
 
-.. code-block:: yaml
+  .. code-block:: yaml
 
     cinder:
       volume:
@@ -514,13 +535,13 @@ Cinder setup with HP LeftHand
             clustername: cluster1
             iscsi_chap_enabled: false
 
-Extra parameters for HP LeftHand
+* Extra parameters for HP LeftHand:
 
-.. code-block:: yaml
+  .. code-block:: yaml
 
     cinder type-key normal-storage set hplh:data_pl=r-10-2 hplh:provisioning=full
 
-Cinder setup with Pure Storage
+* Cinder setup with Pure Storage
 
 .. code-block:: yaml
 
@@ -534,9 +555,9 @@ Cinder setup with Pure Storage
             san_ip: 10.10.10.10
             pure_api_token: 960e185a-255f-4bdb-3b03-3b9eb1e5cf1f
 
-Cinder setup with Solidfire
+* Cinder setup with Solidfire:
 
-.. code-block:: yaml
+  .. code-block:: yaml
 
     cinder:
       volume:
@@ -550,10 +571,14 @@ Cinder setup with Solidfire
             san_password: password
             clustername: cluster1
             sf_emulate_512: false
+            sf_api_port: 14443
+            host: ctl01
+            #for compatibility with old versions
+            sf_account_prefix: PREFIX
 
-Cinder setup with Block Device driver
+* Cinder setup with Block Device driver:
 
-.. code-block:: yaml
+  .. code-block:: yaml
 
     cinder:
       volume:
@@ -568,9 +593,9 @@ Cinder setup with Block Device driver
               - sdc
               - sdd
 
-Enable cinder-backup service for ceph
+* Enable cinder-backup service for ceph
 
-.. code-block:: yaml
+  .. code-block:: yaml
 
     cinder:
       controller:
@@ -598,9 +623,9 @@ Enable cinder-backup service for ceph
           ceph_chunk_size: 134217728
           restore_discard_excess_bytes: false
 
-Enable auditing filter, ie: CADF
+* Auditing filter (CADF) enablement:
 
-.. code-block:: yaml
+  .. code-block:: yaml
 
     cinder:
       controller:
@@ -617,10 +642,9 @@ Enable auditing filter, ie: CADF
           filter_factory: 'keystonemiddleware.audit:filter_factory'
           map_file: '/etc/pycadf/cinder_api_audit_map.conf'
 
+* Cinder setup with custom availability zones:
 
-Cinder setup with custom availability zones:
-
-.. code-block:: yaml
+  .. code-block:: yaml
 
     cinder:
       controller:
@@ -631,10 +655,16 @@ Cinder setup with custom availability zones:
         default_availability_zone: my-default-zone
         storage_availability_zone: my-custom-zone-name
 
+  The ``default_availability_zone`` is used when a volume has been created,
+  without specifying a zone in the ``create`` request as this zone must exist
+  in your configuration.
 
-Cinder setup with custom non-admin volume query filters:
+  The ``storage_availability_zone`` is an actual zone where the node belongs to
+  and must be specified per each node.
 
-.. code-block:: yaml
+* Cinder setup with custom non-admin volume query filters:
+
+  .. code-block:: yaml
 
     cinder:
       controller:
@@ -645,26 +675,25 @@ Cinder setup with custom non-admin volume query filters:
           - availability_zone
           - bootable
 
+* ``public_endpoint`` and ``osapi_volume_base_url``:
 
-public_endpoint and osapi_volume_base_url parameters:
-"public_endpoint" is used for configuring versions endpoint,
-"osapi_volume_base_URL" is used to present Cinder URL to users.
-They are useful when running Cinder under load balancer in SSL.
+  * ``public_endpoint``
+     Used for configuring versions endpoint
+  * ``osapi_volume_base_URL``
+     Used to present Cinder URL to users
 
-.. code-block:: yaml
+  These parameters can be useful when running Cinder under load balancer in
+  SSL.
+
+  .. code-block:: yaml
 
     cinder:
       controller:
         public_endpoint_address: https://${_param:cluster_domain}:8776
 
-The default availability zone is used when a volume has been created, without specifying a zone in the create request. (this zone must exist in your configuration obviously)
-The storage availability zone is the actual zone where the node belongs to. Make sure to specify this per node.
-Check the documentation of OpenStack for more information
+* Client role definition:
 
-
-Client role
-
-.. code-block:: yaml
+  .. code-block:: yaml
 
     cinder:
       client:
@@ -685,62 +714,223 @@ Client role
             key:
               conn_speed: fibre-10G
 
+* Barbican integration enablement:
 
-Documentation and Bugs
-============================
+  .. code-block:: yaml
 
-To learn how to deploy OpenStack Salt, consult the documentation available
-online at:
+    cinder:
+      controller:
+        barbican:
+          enabled: true
 
-https://wiki.openstack.org/wiki/OpenStackSalt
+* Keystone API version specification (v3 is default):
 
-In the unfortunate event that bugs are discovered, they should be reported to
-the appropriate bug tracker. If you obtained the software from a 3rd party
-operating system vendor, it is often wise to use their own bug tracker for
-reporting problems. In all other cases use the master OpenStack bug tracker,
-available at:
+  .. code-block:: yaml
 
-    http://bugs.launchpad.net/openstack-salt
+    cinder:
+      controller:
+        identity:
+          api_version: v2.0
 
-Developers wishing to work on the OpenStack Salt project should always base
-their work on the latest formulas code, available from the master GIT
-repository at:
+**Enhanced logging with logging.conf**
 
-    https://git.openstack.org/cgit/openstack/salt-formula-cinder
+By default ``logging.conf`` is disabled.
+You can enable per-binary ``logging.conf`` by setting the following
+parameters:
 
-Developers should also join the discussion on the IRC list, at:
+* ``openstack_log_appender``
+   Set to ``true`` to enable ``log_config_append`` for all OpenStack
+   services
 
-    https://wiki.openstack.org/wiki/Meetings/openstack-salt
+* ``openstack_fluentd_handler_enabled``
+   Set to ``true`` to enable FluentHandler for all Openstack services
 
-Documentation and Bugs
+* ``openstack_ossyslog_handler_enabled``
+   Set to ``true`` to enable OSSysLogHandler for all Openstack services
+
+Only WatchedFileHandler, OSSysLogHandler, and FluentHandler are available.
+
+To configure this functionality with pillar:
+
+.. code-block:: yaml
+
+  cinder:
+    controller:
+      logging:
+        log_appender: true
+        log_handlers:
+          watchedfile:
+            enabled: true
+          fluentd:
+            enabled: true
+          ossyslog:
+            enabled: true
+
+    volume:
+      logging:
+        log_appender: true
+        log_handlers:
+          watchedfile:
+            enabled: true
+          fluentd:
+            enabled: true
+          ossyslog:
+            enabled: true
+
+Enable x509 and ssl communication between Cinder and Galera cluster.
+---------------------
+By default communication between Cinder and Galera is unsecure.
+
+cinder:
+  volume:
+    database:
+      x509:
+        enabled: True
+  controller:
+    database:
+      x509:
+        enabled: True
+
+You able to set custom certificates in pillar:
+
+cinder:
+  controller:
+    database:
+      x509:
+        cacert: (certificate content)
+        cert: (certificate content)
+        key: (certificate content)
+  volume:
+    database:
+      x509:
+        cacert: (certificate content)
+        cert: (certificate content)
+        key: (certificate content)
+
+You can read more about it here:
+    https://docs.openstack.org/security-guide/databases/database-access-control.html
+
+Cinder services on compute node with memcached caching and security strategy:
+
+.. code-block:: yaml
+
+    cinder:
+      volume:
+        enabled: true
+        ...
+        cache:
+          engine: memcached
+          members:
+          - host: 127.0.0.1
+            port: 11211
+          - host: 127.0.0.1
+            port: 11211
+          security:
+            enabled: true
+            strategy: ENCRYPT
+            secret_key: secret
+
+Cinder services on controller node with memcached caching and security strategy:
+
+.. code-block:: yaml
+
+    cinder:
+      controller:
+        enabled: true
+        ...
+        cache:
+          engine: memcached
+          members:
+          - host: 127.0.0.1
+            port: 11211
+          - host: 127.0.0.1
+            port: 11211
+          security:
+            enabled: true
+            strategy: ENCRYPT
+            secret_key: secret
+
+Upgrades
+========
+
+Each openstack formula provide set of phases (logical bloks) that will help to
+build flexible upgrade orchestration logic for particular components. The list
+of phases and theirs descriptions are listed in table below:
+
++-------------------------------+------------------------------------------------------+
+| State                         | Description                                          |
++===============================+======================================================+
+| <app>.upgrade.service_running | Ensure that all services for particular application  |
+|                               | are enabled for autostart and running                |
++-------------------------------+------------------------------------------------------+
+| <app>.upgrade.service_stopped | Ensure that all services for particular application  |
+|                               | disabled for autostart and dead                      |
++-------------------------------+------------------------------------------------------+
+| <app>.upgrade.pkgs_latest     | Ensure that packages used by particular application  |
+|                               | are installed to latest available version.           |
+|                               | This will not upgrade data plane packages like qemu  |
+|                               | and openvswitch as usually minimal required version  |
+|                               | in openstack services is really old. The data plane  |
+|                               | packages should be upgraded separately by `apt-get   |
+|                               | upgrade` or `apt-get dist-upgrade`                   |
+|                               | Applying this state will not autostart service.      |
++-------------------------------+------------------------------------------------------+
+| <app>.upgrade.render_config   | Ensure configuration is rendered actual version.     +
++-------------------------------+------------------------------------------------------+
+| <app>.upgrade.pre             | We assume this state is applied on all nodes in the  |
+|                               | cloud before running upgrade.                        |
+|                               | Only non destructive actions will be applied during  |
+|                               | this phase. Perform service built in service check   |
+|                               | like (keystone-manage doctor and nova-status upgrade)|
++-------------------------------+------------------------------------------------------+
+| <app>.upgrade.upgrade.pre     | Mostly applicable for data plane nodes. During this  |
+|                               | phase resources will be gracefully removed from      |
+|                               | current node if it is allowed. Services for upgraded |
+|                               | application will be set to admin disabled state to   |
+|                               | make sure node will not participate in resources     |
+|                               | scheduling. For example on gtw nodes this will set   |
+|                               | all agents to admin disable state and will move all  |
+|                               | routers to other agents.                             |
++-------------------------------+------------------------------------------------------+
+| <app>.upgrade.upgrade         | This state will basically upgrade application on     |
+|                               | particular target. Stop services, render             |
+|                               | configuration, install new packages, run offline     |
+|                               | dbsync (for ctl), start services. Data plane should  |
+|                               | not be affected, only OpenStack python services.     |
++-------------------------------+------------------------------------------------------+
+| <app>.upgrade.upgrade.post    | Add services back to scheduling.                     |
++-------------------------------+------------------------------------------------------+
+| <app>.upgrade.post            | This phase should be launched only when upgrade of   |
+|                               | the cloud is completed. Cleanup temporary files,     |
+|                               | perform other post upgrade tasks.                    |
++-------------------------------+------------------------------------------------------+
+| <app>.upgrade.verify          | Here we will do basic health checks (API CRUD        |
+|                               | operations, verify do not have dead network          |
+|                               | agents/compute services)                             |
++-------------------------------+------------------------------------------------------+
+
+
+**Documentation and bugs**
 ======================
+* http://salt-formulas.readthedocs.io/
+   Learn how to install and update salt-formulas
 
-To learn how to install and update salt-formulas, consult the documentation
-available online at:
+* https://github.com/salt-formulas/salt-formula-cinder/issues
+   In the unfortunate event that bugs are discovered, report the issue to the
+   appropriate issue tracker. Use the Github issue tracker for a specific salt
+   formula
 
-    http://salt-formulas.readthedocs.io/
+* https://launchpad.net/salt-formulas
+   For feature requests, bug reports, or blueprints affecting the entire
+   ecosystem, use the Launchpad salt-formulas project
 
-In the unfortunate event that bugs are discovered, they should be reported to
-the appropriate issue tracker. Use Github issue tracker for specific salt
-formula:
+* https://launchpad.net/~salt-formulas-users
+   Join the salt-formulas-users team and subscribe to mailing list if required
 
-    https://github.com/salt-formulas/salt-formula-cinder/issues
+* https://github.com/salt-formulas/salt-formula-cinder
+   Develop the salt-formulas projects in the master branch and then submit pull
+   requests against a specific formula
 
-For feature requests, bug reports or blueprints affecting entire ecosystem,
-use Launchpad salt-formulas project:
-
-    https://launchpad.net/salt-formulas
-
-You can also join salt-formulas-users team and subscribe to mailing list:
-
-    https://launchpad.net/~salt-formulas-users
-
-Developers wishing to work on the salt-formulas projects should always base
-their work on master branch and submit pull request against specific formula.
-
-    https://github.com/salt-formulas/salt-formula-cinder
-
-Any questions or feedback is always welcome so feel free to join our IRC
-channel:
-
-    #salt-formulas @ irc.freenode.net
+* #salt-formulas @ irc.freenode.net
+   Use this IRC channel in case of any questions or feedback which is always
+   welcome

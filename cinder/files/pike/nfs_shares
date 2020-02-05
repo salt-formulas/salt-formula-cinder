@@ -1,0 +1,3 @@
+{%- for nfs_server in backend.devices %}
+{{ nfs_server }}
+{%- endfor %}
